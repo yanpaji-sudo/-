@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>今日水印相机</title>
+    <title>今日水印相机 - 可拖动版</title>
     <style>
         * {
             margin: 0;
@@ -20,6 +20,8 @@
             display: flex;
             justify-content: center;
             align-items: flex-start;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         .container {
@@ -28,7 +30,6 @@
             margin: 0 auto;
         }
 
-        /* 标题 */
         .app-title {
             text-align: center;
             padding: 10px 0 18px 0;
@@ -46,7 +47,6 @@
             letter-spacing: 1px;
         }
 
-        /* 上传 */
         .upload-area {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -78,14 +78,13 @@
             color: rgba(255, 255, 255, 0.4);
         }
 
-        /* ========== 预览区 ========== */
         .preview-section {
             background: #1a1a1a;
             border-radius: 12px;
             overflow: hidden;
             margin-bottom: 16px;
             position: relative;
-            min-height: 340px;
+            min-height: 400px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -109,6 +108,7 @@
             display: none;
             position: relative;
             width: 100%;
+            min-height: 400px;
         }
         .media-container.active {
             display: block;
@@ -117,16 +117,16 @@
         .media-container img,
         .media-container video {
             width: 100%;
-            max-height: 480px;
+            max-height: 500px;
             object-fit: contain;
             display: block;
             background: #111;
         }
 
         /* ================================================================
-           ★★★ 水印 - 像素级还原今日水印 ★★★
+           ★★★ 可拖动水印系统 ★★★
            ================================================================ */
-        .watermark-overlay {
+        .watermark-layer {
             position: absolute;
             top: 0;
             left: 0;
@@ -134,23 +134,63 @@
             bottom: 0;
             pointer-events: none;
             z-index: 10;
+            overflow: hidden;
         }
 
-        /* ---------- 水印卡片：纯白背景 ---------- */
-        .watermark-card {
+        /* ---------- 可拖动元素基类 ---------- */
+        .draggable-item {
             position: absolute;
-            bottom: 16px;
-            left: 12px;
-            right: 12px;
+            pointer-events: auto;
+            cursor: grab;
+            touch-action: none;
+            transition: box-shadow 0.2s;
+            border-radius: 6px;
+        }
+        .draggable-item:active {
+            cursor: grabbing;
+        }
+        .draggable-item .resize-handle {
+            position: absolute;
+            bottom: -6px;
+            right: -6px;
+            width: 16px;
+            height: 16px;
+            background: rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            cursor: nwse-resize;
+            display: none;
+            pointer-events: auto;
+        }
+        .draggable-item:hover .resize-handle {
+            display: block;
+        }
+        .draggable-item .drag-border {
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border: 2px dashed rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            display: none;
+            pointer-events: none;
+        }
+        .draggable-item:hover .drag-border {
+            display: block;
+        }
+
+        /* ---------- 主水印卡片 ---------- */
+        .watermark-card {
             background: #ffffff;
             border-radius: 6px;
             overflow: hidden;
             box-shadow: 0 4px 24px rgba(0, 0, 0, 0.7);
-            pointer-events: none;
+            width: 100%;
+            height: 100%;
             font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif;
         }
 
-        /* ----- 顶部蓝条 ----- */
         .wm-header {
             background: linear-gradient(135deg, #1a6bc4, #2a7ee8);
             padding: 5px 14px;
@@ -174,45 +214,31 @@
             letter-spacing: 0.3px;
         }
 
-        /* ----- 内容区：白底黑字，左对齐，连在一起 ----- */
         .wm-body {
             padding: 8px 14px 6px 14px;
             background: #ffffff;
         }
 
-        /* 每一行：标签+值连在一起，用冒号分隔 */
         .wm-line {
             font-size: 12px;
             line-height: 1.7;
             color: #1a1a1a;
             letter-spacing: 0.2px;
             font-weight: 400;
+            white-space: nowrap;
         }
-
         .wm-line .wm-label {
             color: #555555;
             font-weight: 400;
         }
-
         .wm-line .wm-value {
             color: #1a1a1a;
             font-weight: 400;
         }
-
-        .wm-line .wm-value-light {
-            color: #555555;
-            font-weight: 400;
+        .wm-high-temp {
+            color: #e53935;
+            font-weight: 500;
         }
-
-        /* 天气里的高温 */
-        .wm-weather-text {
-            color: #1a1a1a;
-        }
-        .wm-weather-text .wm-high {
-            color: #555555;
-        }
-
-        /* 地点带箭头 */
         .wm-location-text {
             color: #1a1a1a;
         }
@@ -222,147 +248,54 @@
             margin-left: 2px;
         }
 
-        /* ----- 底部防伪：两行 ----- */
-        .wm-footer {
-            padding: 4px 14px 8px 14px;
-            background: #ffffff;
-            border-top: 1px solid #e8e8e8;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-        }
-
-        .wm-footer .wm-brand-group {
+        /* ---------- 防伪标签（独立可拖动） ---------- */
+        .anti-tag {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 6px;
+            padding: 6px 12px 6px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+            width: 100%;
+            height: 100%;
             display: flex;
             flex-direction: column;
-            line-height: 1.5;
+            justify-content: center;
+            min-width: 100px;
         }
 
-        .wm-footer .wm-brand-name {
-            color: #1a1a1a;
-            font-size: 12px;
+        .anti-tag .anti-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            line-height: 1.4;
+        }
+
+        .anti-tag .anti-brand {
+            color: #ffffff;
+            font-size: 11px;
             font-weight: 500;
             letter-spacing: 0.3px;
         }
 
-        .wm-footer .wm-brand-sub {
-            color: #999999;
-            font-size: 9px;
+        .anti-tag .anti-sub {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 8px;
             letter-spacing: 0.2px;
         }
 
-        .wm-footer .wm-anti {
-            color: #bbbbbb;
-            font-size: 9px;
+        .anti-tag .anti-code {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 8px;
             font-family: 'Courier New', 'Monaco', monospace;
             letter-spacing: 0.2px;
-            background: #f5f5f5;
-            padding: 1px 10px;
-            border-radius: 3px;
-            align-self: center;
-        }
-        .wm-footer .wm-anti .hl {
-            color: #888888;
-        }
-
-        /* ---------- 黑底样式 ---------- */
-        .watermark-card-dark {
-            position: absolute;
-            bottom: 16px;
-            left: 12px;
-            right: 12px;
-            background: rgba(0, 0, 0, 0.72);
-            backdrop-filter: blur(6px);
-            border-radius: 6px;
-            overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            pointer-events: none;
-        }
-        .watermark-card-dark .wm-body {
-            background: transparent;
-            padding: 10px 14px 6px 14px;
-        }
-        .watermark-card-dark .wm-line {
-            color: #ffffff;
-        }
-        .watermark-card-dark .wm-line .wm-label {
-            color: rgba(255, 255, 255, 0.4);
-        }
-        .watermark-card-dark .wm-line .wm-value {
-            color: #ffffff;
-        }
-        .watermark-card-dark .wm-line .wm-value-light {
-            color: rgba(255, 255, 255, 0.5);
-        }
-        .watermark-card-dark .wm-weather-text .wm-high {
-            color: rgba(255, 255, 255, 0.4);
-        }
-        .watermark-card-dark .wm-location-text {
-            color: #ffffff;
-        }
-        .watermark-card-dark .wm-location-text .wm-arrow {
-            color: rgba(255, 255, 255, 0.2);
-        }
-        .watermark-card-dark .wm-footer {
-            background: transparent;
-            border-top-color: rgba(255, 255, 255, 0.05);
-        }
-        .watermark-card-dark .wm-footer .wm-brand-name {
-            color: rgba(255, 255, 255, 0.8);
-        }
-        .watermark-card-dark .wm-footer .wm-brand-sub {
-            color: rgba(255, 255, 255, 0.3);
-        }
-        .watermark-card-dark .wm-footer .wm-anti {
-            color: rgba(255, 255, 255, 0.2);
             background: rgba(255, 255, 255, 0.05);
-        }
-        .watermark-card-dark .wm-footer .wm-anti .hl {
-            color: rgba(255, 215, 0, 0.2);
-        }
-
-        /* ---------- 简洁白字 ---------- */
-        .watermark-card-simple {
-            position: absolute;
-            bottom: 16px;
-            left: 12px;
-            right: 12px;
-            background: rgba(0, 0, 0, 0.35);
-            backdrop-filter: blur(4px);
-            border-radius: 6px;
-            border: none;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
-            pointer-events: none;
-        }
-        .watermark-card-simple .wm-body {
-            background: transparent;
-            padding: 10px 14px 6px 14px;
-        }
-        .watermark-card-simple .wm-line {
-            color: #ffffff;
-        }
-        .watermark-card-simple .wm-line .wm-label {
-            color: rgba(255, 255, 255, 0.35);
-        }
-        .watermark-card-simple .wm-line .wm-value {
-            color: #ffffff;
-        }
-        .watermark-card-simple .wm-line .wm-value-light {
-            color: rgba(255, 255, 255, 0.5);
-        }
-        .watermark-card-simple .wm-footer {
-            background: transparent;
-            border-top-color: rgba(255, 255, 255, 0.05);
-            justify-content: flex-end;
-        }
-        .watermark-card-simple .wm-footer .wm-brand-sub {
-            color: rgba(255, 255, 255, 0.2);
+            padding: 1px 8px;
+            border-radius: 3px;
         }
 
-        /* ================================================================
-           编辑区
-           ================================================================ */
+        /* ---------- 样式切换（底部控制） ---------- */
         .edit-area {
             background: rgba(255, 255, 255, 0.03);
             border-radius: 10px;
@@ -411,7 +344,6 @@
             color: rgba(255, 255, 255, 0.2);
             font-size: 12px;
         }
-
         .edit-row .temp-group {
             display: flex;
             align-items: center;
@@ -446,7 +378,6 @@
             color: rgba(255, 255, 255, 0.25);
         }
 
-        /* 样式切换 */
         .style-selector {
             display: flex;
             gap: 8px;
@@ -473,7 +404,6 @@
             background: rgba(255, 255, 255, 0.05);
         }
 
-        /* 防伪开关 */
         .anti-switch {
             display: flex;
             align-items: center;
@@ -594,18 +524,32 @@
             display: none;
         }
 
+        /* 控制提示 */
+        .drag-hint {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.15);
+            font-size: 9px;
+            letter-spacing: 0.5px;
+            pointer-events: none;
+            z-index: 5;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 12px;
+            border-radius: 10px;
+            display: none;
+        }
+        .media-container.active .drag-hint {
+            display: block;
+        }
+
         @media (max-width: 400px) {
             .wm-line {
-                font-size: 11px;
+                font-size: 10px;
             }
             .wm-header .wm-title {
-                font-size: 12px;
-            }
-            .wm-footer .wm-brand-name {
                 font-size: 11px;
-            }
-            .wm-footer .wm-anti {
-                font-size: 8px;
             }
         }
     </style>
@@ -615,10 +559,9 @@
 
         <div class="app-title">
             📷 今日水印相机
-            <span>选择照片 · 添加专业水印</span>
+            <span>拖拽 · 缩放 · 自由布局</span>
         </div>
 
-        <!-- 上传 -->
         <div class="upload-area">
             <div class="upload-btn" id="uploadImageBtn">
                 <span class="icon">🖼️</span>
@@ -632,7 +575,6 @@
             <input type="file" id="videoInput" class="hidden-input" accept="video/*">
         </div>
 
-        <!-- 预览 -->
         <div class="preview-section" id="previewSection">
             <div class="placeholder" id="placeholder">
                 <span class="big-icon">📸</span>
@@ -640,20 +582,20 @@
                 <span style="font-size:11px;color:rgba(255,255,255,0.1);">支持 JPG, PNG, MP4, MOV</span>
             </div>
             <div class="media-container" id="mediaContainer">
-                <img id="previewImage" style="display:none;width:100%;max-height:480px;object-fit:contain;background:#111;">
-                <video id="previewVideo" style="display:none;width:100%;max-height:480px;object-fit:contain;background:#111;" controls></video>
-                <div class="watermark-overlay" id="watermarkOverlay"></div>
+                <img id="previewImage" style="display:none;width:100%;max-height:500px;object-fit:contain;background:#111;">
+                <video id="previewVideo" style="display:none;width:100%;max-height:500px;object-fit:contain;background:#111;" controls></video>
+                <!-- 水印图层 -->
+                <div class="watermark-layer" id="watermarkLayer"></div>
+                <div class="drag-hint" id="dragHint">↕ 拖拽移动 · 右下角缩放</div>
             </div>
         </div>
 
-        <!-- 样式切换 -->
         <div class="style-selector">
             <button class="style-btn active" data-style="white">白底蓝条</button>
             <button class="style-btn" data-style="dark">黑底透明</button>
             <button class="style-btn" data-style="simple">简洁白字</button>
         </div>
 
-        <!-- 编辑 -->
         <div class="edit-area">
             <div class="edit-row">
                 <label>📅 日期</label>
@@ -690,18 +632,17 @@
             </div>
         </div>
 
-        <!-- 防伪 -->
         <div class="anti-switch">
             <label>
-                <input type="checkbox" id="antiFake" checked>
-                🛡️ 防伪标志
+                <input type="checkbox" id="showAntiTag" checked>
+                🏷️ 显示防伪标签
             </label>
             <label>
-                <input type="checkbox" id="showBrand" checked>
-                ℹ️ 品牌标识
+                <input type="checkbox" id="showMainCard" checked>
+                📋 显示主水印
             </label>
             <label style="margin-left:auto;color:rgba(255,255,255,0.15);font-size:10px;">
-                防伪码自动生成
+                拖拽·缩放
             </label>
         </div>
 
@@ -731,7 +672,8 @@
             const previewVideo = document.getElementById('previewVideo');
             const mediaContainer = document.getElementById('mediaContainer');
             const placeholder = document.getElementById('placeholder');
-            const watermarkOverlay = document.getElementById('watermarkOverlay');
+            const watermarkLayer = document.getElementById('watermarkLayer');
+            const dragHint = document.getElementById('dragHint');
             const editDate = document.getElementById('editDate');
             const editTime = document.getElementById('editTime');
             const editWeather = document.getElementById('editWeather');
@@ -739,8 +681,8 @@
             const editLocation = document.getElementById('editLocation');
             const editTitle = document.getElementById('editTitle');
             const suggestions = document.getElementById('suggestions');
-            const antiFake = document.getElementById('antiFake');
-            const showBrand = document.getElementById('showBrand');
+            const showAntiTag = document.getElementById('showAntiTag');
+            const showMainCard = document.getElementById('showMainCard');
             const exportBtn = document.getElementById('exportBtn');
             const progressBar = document.getElementById('progressBar');
             const progressFill = document.getElementById('progressFill');
@@ -754,6 +696,11 @@
             let currentFile = null;
             let isVideo = false;
             let mediaUrl = null;
+            let antiCode = generateAntiCode();
+
+            // 可拖动元素状态
+            let mainCardState = { x: 30, y: 50, w: 240, h: 100 };
+            let antiTagState = { x: 200, y: 180, w: 160, h: 50 };
 
             // ============================================================
             // 防伪码
@@ -766,7 +713,6 @@
                 }
                 return code;
             }
-            let antiCode = generateAntiCode();
 
             // ============================================================
             // 位置数据
@@ -785,10 +731,6 @@
                 { name: '九眼桥', addr: '成都市锦江区·九眼桥' },
                 { name: '妙中小区', addr: '张家港市·杨舍镇' },
                 { name: '张家港站', addr: '张家港市·塘桥镇' },
-                { name: '上海外滩', addr: '上海市黄浦区·中山东一路' },
-                { name: '北京天安门', addr: '北京市东城区·长安街' },
-                { name: '广州塔', addr: '广州市海珠区·阅江西路' },
-                { name: '深圳湾', addr: '深圳市南山区·滨海大道' },
             ];
 
             // ============================================================
@@ -800,7 +742,7 @@
                 toast.textContent = msg;
                 toast.classList.add('show');
                 clearTimeout(toastTimer);
-                toastTimer = setTimeout(() => toast.classList.remove('show'), 2500);
+                toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
             }
 
             // ============================================================
@@ -863,150 +805,318 @@
                 }
 
                 fileInfo.textContent = '📁 ' + file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
-                updateWatermark();
+                renderWatermarks();
                 showToast('✅ 已加载' + (video ? '视频' : '照片'));
             }
 
-            // ================================================================
-            // ★★★ 核心：水印渲染 - 像素级还原 ★★★
-            // ================================================================
-            function updateWatermark() {
+            // ============================================================
+            // ★★★ 渲染水印（可拖动） ★★★
+            // ============================================================
+            function renderWatermarks() {
+                const layer = watermarkLayer;
+                const container = mediaContainer;
+                const rect = container.getBoundingClientRect();
+                const scale = rect.width / 420 || 1;
+
                 const date = editDate.value || '2026-08-08';
                 const time = editTime.value || '15:12';
                 const weather = editWeather.value || '晴';
                 const temp = editTemp.value || '35';
                 const location = editLocation.value || '成都市双流区·芝麻公园';
                 const title = editTitle.value || '工程记录';
-                const showAnti = antiFake.checked;
-                const showBrandFlag = showBrand.checked;
 
                 const dateParts = date.split('-');
                 const formattedDate = dateParts[0] + '.' + dateParts[1] + '.' + dateParts[2];
 
-                if (showAnti) {
+                if (showAntiTag.checked) {
                     antiCode = generateAntiCode();
                 }
 
+                // ---- 构建主水印HTML ----
+                const mainHTML = buildMainCardHTML(title, formattedDate, time, weather, temp, location);
+
+                // ---- 构建防伪标签HTML ----
+                const antiHTML = buildAntiTagHTML(antiCode);
+
+                // ---- 组装 ----
+                const showMain = showMainCard.checked;
+                const showAnti = showAntiTag.checked;
+
+                // 应用缩放
+                const ms = mainCardState;
+                const as = antiTagState;
+
                 let html = '';
 
-                // ============================================================
-                // 样式1：白底蓝条（与今日水印完全一致）
-                // ============================================================
+                if (showMain) {
+                    html += `
+                        <div class="draggable-item" id="mainCard" 
+                             style="left:${ms.x * scale}px; top:${ms.y * scale}px; width:${ms.w * scale}px; height:${ms.h * scale}px;"
+                             data-x="${ms.x}" data-y="${ms.y}" data-w="${ms.w}" data-h="${ms.h}">
+                            <div class="drag-border"></div>
+                            ${mainHTML}
+                            <div class="resize-handle" id="mainResize"></div>
+                        </div>
+                    `;
+                }
+
+                if (showAnti) {
+                    html += `
+                        <div class="draggable-item" id="antiTag" 
+                             style="left:${as.x * scale}px; top:${as.y * scale}px; width:${as.w * scale}px; height:${as.h * scale}px;"
+                             data-x="${as.x}" data-y="${as.y}" data-w="${as.w}" data-h="${as.h}">
+                            <div class="drag-border"></div>
+                            ${antiHTML}
+                            <div class="resize-handle" id="antiResize"></div>
+                        </div>
+                    `;
+                }
+
+                layer.innerHTML = html;
+
+                // 重新绑定拖动事件
+                setTimeout(() => {
+                    initDraggable('mainCard', 'mainResize', (x, y, w, h) => {
+                        mainCardState.x = x;
+                        mainCardState.y = y;
+                        mainCardState.w = w;
+                        mainCardState.h = h;
+                    });
+                    initDraggable('antiTag', 'antiResize', (x, y, w, h) => {
+                        antiTagState.x = x;
+                        antiTagState.y = y;
+                        antiTagState.w = w;
+                        antiTagState.h = h;
+                    });
+                }, 50);
+            }
+
+            // ============================================================
+            // 构建主水印HTML
+            // ============================================================
+            function buildMainCardHTML(title, date, time, weather, temp, location) {
                 if (currentStyle === 'white') {
-                    html = `
+                    return `
                         <div class="watermark-card">
                             <div class="wm-header">
                                 <span class="wm-title">${title}</span>
                                 <span class="wm-badge">水印</span>
                             </div>
                             <div class="wm-body">
-                                <div class="wm-line">
-                                    <span class="wm-label">拍摄时间：</span>
-                                    <span class="wm-value">${formattedDate} ${time}</span>
-                                </div>
-                                <div class="wm-line">
-                                    <span class="wm-label">天气：</span>
-                                    <span class="wm-value">${weather} <span class="wm-high">高温 ${temp}°C</span></span>
-                                </div>
-                                <div class="wm-line" style="margin-bottom:0;">
-                                    <span class="wm-label">地点：</span>
-                                    <span class="wm-location-text">${location} <span class="wm-arrow">▸</span></span>
-                                </div>
-                            </div>
-                            <div class="wm-footer">
-                                <div class="wm-brand-group">
-                                    <span class="wm-brand-name">今日水印</span>
-                                    <span class="wm-brand-sub">相机真实可验</span>
-                                </div>
-                                ${showAnti ? `<span class="wm-anti">防伪 <span class="hl">${antiCode}</span></span>` : ''}
-                                ${!showAnti && showBrandFlag ? `<span class="wm-anti" style="color:#ddd;">今日水印</span>` : ''}
+                                <div class="wm-line"><span class="wm-label">拍摄时间：</span><span class="wm-value">${date} ${time}</span></div>
+                                <div class="wm-line"><span class="wm-label">天气：</span><span class="wm-value">${weather} 高温 <span class="wm-high-temp">${temp}°C</span></span></div>
+                                <div class="wm-line" style="margin-bottom:0;"><span class="wm-label">地点：</span><span class="wm-location-text">${location} <span class="wm-arrow">▸</span></span></div>
                             </div>
                         </div>
                     `;
-                }
-
-                // ============================================================
-                // 样式2：黑底透明
-                // ============================================================
-                else if (currentStyle === 'dark') {
-                    html = `
-                        <div class="watermark-card-dark">
-                            <div class="wm-body">
-                                <div class="wm-line" style="font-weight:500;font-size:13px;margin-bottom:2px;">
-                                    ${title}
-                                </div>
-                                <div class="wm-line">
-                                    <span class="wm-label">时间：</span>
-                                    <span class="wm-value">${formattedDate} ${time}</span>
-                                </div>
-                                <div class="wm-line">
-                                    <span class="wm-label">天气：</span>
-                                    <span class="wm-value">${weather} ${temp}°C</span>
-                                </div>
-                                <div class="wm-line" style="margin-bottom:0;">
-                                    <span class="wm-label">地点：</span>
-                                    <span class="wm-value">${location}</span>
-                                </div>
+                } else if (currentStyle === 'dark') {
+                    return `
+                        <div class="watermark-card" style="background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.05);">
+                            <div class="wm-body" style="padding:10px 14px 8px 14px;">
+                                <div class="wm-line" style="font-weight:500;font-size:13px;color:#fff;margin-bottom:2px;">${title}</div>
+                                <div class="wm-line" style="color:#fff;"><span class="wm-label" style="color:rgba(255,255,255,0.4);">时间：</span><span class="wm-value" style="color:#fff;">${date} ${time}</span></div>
+                                <div class="wm-line" style="color:#fff;"><span class="wm-label" style="color:rgba(255,255,255,0.4);">天气：</span><span class="wm-value" style="color:#fff;">${weather} ${temp}°C</span></div>
+                                <div class="wm-line" style="margin-bottom:0;color:#fff;"><span class="wm-label" style="color:rgba(255,255,255,0.4);">地点：</span><span class="wm-value" style="color:#fff;">${location}</span></div>
                             </div>
-                            ${showAnti ? `
-                            <div class="wm-footer" style="border-top-color:rgba(255,255,255,0.05);">
-                                <div class="wm-brand-group">
-                                    <span class="wm-brand-name" style="color:rgba(255,255,255,0.5);font-size:11px;">今日水印</span>
-                                    <span class="wm-brand-sub" style="color:rgba(255,255,255,0.2);">真实可验</span>
-                                </div>
-                                <span class="wm-anti" style="color:rgba(255,255,255,0.12);background:rgba(255,255,255,0.03);">${antiCode}</span>
-                            </div>` : ''}
                         </div>
                     `;
-                }
-
-                // ============================================================
-                // 样式3：简洁白字
-                // ============================================================
-                else if (currentStyle === 'simple') {
-                    html = `
-                        <div class="watermark-card-simple">
-                            <div class="wm-body">
-                                <div style="font-size:20px;font-weight:300;color:#fff;letter-spacing:1px;">${formattedDate}</div>
+                } else {
+                    // simple
+                    return `
+                        <div class="watermark-card" style="background:rgba(0,0,0,0.3);backdrop-filter:blur(4px);border:none;box-shadow:0 2px 12px rgba(0,0,0,0.3);">
+                            <div class="wm-body" style="background:transparent;padding:10px 14px 8px 14px;">
+                                <div style="font-size:20px;font-weight:300;color:#fff;letter-spacing:1px;">${date}</div>
                                 <div style="font-size:26px;font-weight:200;color:#fff;margin:-2px 0 2px 0;">${time}</div>
-                                <div style="display:flex;justify-content:space-between;font-size:12px;color:rgba(255,255,255,0.8);margin-bottom:2px;">
+                                <div style="display:flex;justify-content:space-between;font-size:12px;color:rgba(255,255,255,0.85);">
                                     <span>${weather} ${temp}°C</span>
                                     <span>${location}</span>
                                 </div>
                             </div>
-                            ${showAnti ? `
-                            <div class="wm-footer" style="border-top-color:rgba(255,255,255,0.05);justify-content:flex-end;padding-top:2px;">
-                                <span class="wm-brand-sub" style="color:rgba(255,255,255,0.15);font-size:9px;">今日水印 · 真实可验</span>
-                            </div>` : ''}
                         </div>
                     `;
                 }
-
-                watermarkOverlay.innerHTML = html;
             }
 
             // ============================================================
-            // 样式切换
+            // 构建防伪标签HTML
             // ============================================================
-            document.querySelectorAll('.style-btn').forEach(function(btn) {
-                btn.addEventListener('click', function() {
-                    document.querySelectorAll('.style-btn').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    currentStyle = this.dataset.style;
-                    updateWatermark();
-                });
-            });
+            function buildAntiTagHTML(code) {
+                return `
+                    <div class="anti-tag">
+                        <div class="anti-row">
+                            <span class="anti-brand">今日水印</span>
+                            <span class="anti-code">${code}</span>
+                        </div>
+                        <div class="anti-row">
+                            <span class="anti-sub">相机真实可验</span>
+                        </div>
+                    </div>
+                `;
+            }
 
             // ============================================================
-            // 编辑事件
+            // ★★★ 拖动+缩放系统 ★★★
             // ============================================================
-            editDate.addEventListener('change', updateWatermark);
-            editTime.addEventListener('change', updateWatermark);
-            editWeather.addEventListener('change', updateWatermark);
-            editTemp.addEventListener('change', updateWatermark);
-            editTitle.addEventListener('input', updateWatermark);
-            antiFake.addEventListener('change', updateWatermark);
-            showBrand.addEventListener('change', updateWatermark);
+            function initDraggable(elementId, resizeHandleId, onUpdate) {
+                const el = document.getElementById(elementId);
+                if (!el) return;
+
+                const container = mediaContainer;
+                let isDragging = false;
+                let isResizing = false;
+                let startX, startY, startW, startH, startMX, startMY;
+
+                // 拖动
+                el.addEventListener('mousedown', function(e) {
+                    if (e.target.closest('.resize-handle')) return;
+                    isDragging = true;
+                    const rect = container.getBoundingClientRect();
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    const scale = rect.width / 420 || 1;
+                    const x = parseFloat(el.dataset.x) || 0;
+                    const y = parseFloat(el.dataset.y) || 0;
+                    startMX = x;
+                    startMY = y;
+                    el.style.cursor = 'grabbing';
+                    e.preventDefault();
+                });
+
+                // 缩放
+                const resizeHandle = document.getElementById(resizeHandleId);
+                if (resizeHandle) {
+                    resizeHandle.addEventListener('mousedown', function(e) {
+                        e.stopPropagation();
+                        isResizing = true;
+                        const rect = container.getBoundingClientRect();
+                        startX = e.clientX;
+                        startY = e.clientY;
+                        const scale = rect.width / 420 || 1;
+                        startW = parseFloat(el.dataset.w) || 200;
+                        startH = parseFloat(el.dataset.h) || 100;
+                        el.style.cursor = 'nwse-resize';
+                        e.preventDefault();
+                    });
+                }
+
+                // 移动/缩放
+                document.addEventListener('mousemove', function(e) {
+                    const rect = container.getBoundingClientRect();
+                    const scale = rect.width / 420 || 1;
+
+                    if (isDragging) {
+                        const dx = (e.clientX - startX) / scale;
+                        const dy = (e.clientY - startY) / scale;
+                        const newX = Math.max(0, startMX + dx);
+                        const newY = Math.max(0, startMY + dy);
+                        el.dataset.x = newX;
+                        el.dataset.y = newY;
+                        el.style.left = (newX * scale) + 'px';
+                        el.style.top = (newY * scale) + 'px';
+                        if (onUpdate) onUpdate(newX, newY, parseFloat(el.dataset.w), parseFloat(el.dataset.h));
+                    }
+
+                    if (isResizing) {
+                        const dw = (e.clientX - startX) / scale;
+                        const dh = (e.clientY - startY) / scale;
+                        const newW = Math.max(80, startW + dw);
+                        const newH = Math.max(50, startH + dh);
+                        el.dataset.w = newW;
+                        el.dataset.h = newH;
+                        el.style.width = (newW * scale) + 'px';
+                        el.style.height = (newH * scale) + 'px';
+                        if (onUpdate) onUpdate(parseFloat(el.dataset.x), parseFloat(el.dataset.y), newW, newH);
+                    }
+                });
+
+                document.addEventListener('mouseup', function() {
+                    if (isDragging) {
+                        isDragging = false;
+                        el.style.cursor = 'grab';
+                    }
+                    if (isResizing) {
+                        isResizing = false;
+                        el.style.cursor = 'default';
+                    }
+                });
+
+                // 触摸支持
+                let touchStartX, touchStartY, touchStartW, touchStartH, touchStartMX, touchStartMY;
+                let touchDist = 0;
+
+                el.addEventListener('touchstart', function(e) {
+                    const touches = e.touches;
+                    if (touches.length === 1 && !e.target.closest('.resize-handle')) {
+                        isDragging = true;
+                        const rect = container.getBoundingClientRect();
+                        const scale = rect.width / 420 || 1;
+                        touchStartX = touches[0].clientX;
+                        touchStartY = touches[0].clientY;
+                        touchStartMX = parseFloat(el.dataset.x) || 0;
+                        touchStartMY = parseFloat(el.dataset.y) || 0;
+                        e.preventDefault();
+                    } else if (touches.length === 2) {
+                        // 双指缩放
+                        isResizing = true;
+                        const rect = container.getBoundingClientRect();
+                        const scale = rect.width / 420 || 1;
+                        touchStartW = parseFloat(el.dataset.w) || 200;
+                        touchStartH = parseFloat(el.dataset.h) || 100;
+                        touchDist = Math.hypot(touches[0].clientX - touches[1].clientX,
+                            touches[0].clientY - touches[1].clientY);
+                        e.preventDefault();
+                    }
+                });
+
+                el.addEventListener('touchmove', function(e) {
+                    const rect = container.getBoundingClientRect();
+                    const scale = rect.width / 420 || 1;
+                    const touches = e.touches;
+
+                    if (isDragging && touches.length === 1) {
+                        const dx = (touches[0].clientX - touchStartX) / scale;
+                        const dy = (touches[0].clientY - touchStartY) / scale;
+                        const newX = Math.max(0, touchStartMX + dx);
+                        const newY = Math.max(0, touchStartMY + dy);
+                        el.dataset.x = newX;
+                        el.dataset.y = newY;
+                        el.style.left = (newX * scale) + 'px';
+                        el.style.top = (newY * scale) + 'px';
+                        if (onUpdate) onUpdate(newX, newY, parseFloat(el.dataset.w), parseFloat(el.dataset.h));
+                        e.preventDefault();
+                    }
+
+                    if (isResizing && touches.length === 2) {
+                        const newDist = Math.hypot(touches[0].clientX - touches[1].clientX,
+                            touches[0].clientY - touches[1].clientY);
+                        const ratio = newDist / touchDist;
+                        const newW = Math.max(80, touchStartW * ratio);
+                        const newH = Math.max(50, touchStartH * ratio);
+                        el.dataset.w = newW;
+                        el.dataset.h = newH;
+                        el.style.width = (newW * scale) + 'px';
+                        el.style.height = (newH * scale) + 'px';
+                        if (onUpdate) onUpdate(parseFloat(el.dataset.x), parseFloat(el.dataset.y), newW, newH);
+                        e.preventDefault();
+                    }
+                });
+
+                el.addEventListener('touchend', function() {
+                    isDragging = false;
+                    isResizing = false;
+                });
+            }
+
+            // ============================================================
+            // 事件绑定
+            // ============================================================
+            editDate.addEventListener('change', renderWatermarks);
+            editTime.addEventListener('change', renderWatermarks);
+            editWeather.addEventListener('change', renderWatermarks);
+            editTemp.addEventListener('change', renderWatermarks);
+            editTitle.addEventListener('input', renderWatermarks);
+            showAntiTag.addEventListener('change', renderWatermarks);
+            showMainCard.addEventListener('change', renderWatermarks);
 
             // ============================================================
             // 位置联想
@@ -1017,11 +1127,9 @@
                     suggestions.classList.remove('active');
                     return;
                 }
-
                 const results = mockLocations.filter(function(item) {
                     return item.name.includes(value) || item.addr.includes(value);
                 });
-
                 if (results.length === 0) {
                     suggestions.innerHTML =
                         `<div class="item" onclick="window.selectLocation('${value}')">📌 使用 "${value}"</div>`;
@@ -1053,7 +1161,7 @@
             window.selectLocation = function(loc) {
                 editLocation.value = loc;
                 suggestions.classList.remove('active');
-                updateWatermark();
+                renderWatermarks();
                 showToast('📍 位置已更新');
             };
 
@@ -1063,141 +1171,168 @@
                 }
             });
 
-            // ================================================================
-            // Canvas绘制 - 导出
-            // ================================================================
-            function drawWatermarkOnCanvas(ctx, w, h) {
+            // ============================================================
+            // 样式切换
+            // ============================================================
+            document.querySelectorAll('.style-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.style-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentStyle = this.dataset.style;
+                    renderWatermarks();
+                });
+            });
+
+            // ============================================================
+            // Canvas导出
+            // ============================================================
+            function drawWatermarksOnCanvas(ctx, w, h) {
                 const date = editDate.value || '2026-08-08';
                 const time = editTime.value || '15:12';
                 const weather = editWeather.value || '晴';
                 const temp = editTemp.value || '35';
                 const location = editLocation.value || '成都市双流区·芝麻公园';
                 const title = editTitle.value || '工程记录';
-                const showAnti = antiFake.checked;
+                const showAnti = showAntiTag.checked;
+                const showMain = showMainCard.checked;
 
                 const dateParts = date.split('-');
                 const formattedDate = dateParts[0] + '.' + dateParts[1] + '.' + dateParts[2];
                 const code = showAnti ? generateAntiCode() : '';
 
                 const scale = Math.min(w, h) / 800;
-                const baseFont = Math.max(10, 13 * scale);
-                const smallFont = Math.max(8, 10 * scale);
-                const padding = Math.max(12, 18 * scale);
 
-                const cardW = w - padding * 2;
-                const cardH = 125 * scale;
-                const cardX = padding;
-                const cardY = h - padding - cardH;
+                // 主水印
+                if (showMain) {
+                    const ms = mainCardState;
+                    const cx = ms.x * (w / 420);
+                    const cy = ms.y * (h / 700);
+                    const cw = ms.w * (w / 420);
+                    const ch = ms.h * (h / 700);
 
-                // ---- 白底卡片 ----
+                    drawMainCard(ctx, cx, cy, cw, ch, title, formattedDate, time, weather, temp, location, scale);
+                }
+
+                // 防伪标签
+                if (showAnti) {
+                    const as = antiTagState;
+                    const ax = as.x * (w / 420);
+                    const ay = as.y * (h / 700);
+                    const aw = as.w * (w / 420);
+                    const ah = as.h * (h / 700);
+
+                    drawAntiTag(ctx, ax, ay, aw, ah, code, scale);
+                }
+            }
+
+            function drawMainCard(ctx, x, y, w, h, title, date, time, weather, temp, location, scale) {
+                const r = 6 * scale;
+                const pad = 10 * scale;
+
+                // 白底
                 ctx.shadowColor = 'rgba(0,0,0,0.5)';
-                ctx.shadowBlur = 20;
+                ctx.shadowBlur = 16 * scale;
                 ctx.fillStyle = '#ffffff';
                 ctx.beginPath();
-                ctx.roundRect(cardX, cardY, cardW, cardH, 6 * scale);
+                ctx.roundRect(x, y, w, h, r);
                 ctx.fill();
                 ctx.shadowBlur = 0;
 
-                let y = cardY;
+                let cy = y;
 
-                // ---- 蓝条 ----
-                const barH = 26 * scale;
-                const grad = ctx.createLinearGradient(cardX, y, cardX, y + barH);
+                // 蓝条
+                const barH = 24 * scale;
+                const grad = ctx.createLinearGradient(x, cy, x, cy + barH);
                 grad.addColorStop(0, '#1a6bc4');
                 grad.addColorStop(1, '#2a7ee8');
                 ctx.fillStyle = grad;
                 ctx.beginPath();
-                ctx.roundRect(cardX, y, cardW, barH, 6 * scale);
+                ctx.roundRect(x, cy, w, barH, r);
                 ctx.fill();
 
                 ctx.fillStyle = '#ffffff';
-                ctx.font = '500 ' + (12 * scale) + 'px -apple-system, sans-serif';
+                ctx.font = '500 ' + (11 * scale) + 'px -apple-system, sans-serif';
                 ctx.textAlign = 'left';
                 ctx.textBaseline = 'middle';
-                ctx.fillText(title, cardX + 14 * scale, y + barH / 2);
+                ctx.fillText(title, x + pad, cy + barH / 2);
 
                 ctx.fillStyle = 'rgba(255,255,255,0.5)';
-                ctx.font = (8 * scale) + 'px -apple-system, sans-serif';
+                ctx.font = (7 * scale) + 'px -apple-system, sans-serif';
                 ctx.textAlign = 'right';
-                ctx.fillText('水印', cardX + cardW - 14 * scale, y + barH / 2);
+                ctx.fillText('水印', x + w - pad, cy + barH / 2);
 
-                y += barH;
+                cy += barH + 4 * scale;
 
-                // ---- 内容 ----
-                const lineH = 20 * scale;
-                const labelX = cardX + 14 * scale;
-                y += 4 * scale;
+                // 内容
+                const lineH = 18 * scale;
+                const labelX = x + pad;
+                const valX = x + pad + 50 * scale;
 
-                // 拍摄时间：
                 ctx.fillStyle = '#555555';
-                ctx.font = (11 * scale) + 'px -apple-system, sans-serif';
+                ctx.font = (10 * scale) + 'px -apple-system, sans-serif';
                 ctx.textAlign = 'left';
                 ctx.textBaseline = 'middle';
-                ctx.fillText('拍摄时间：', labelX, y + lineH / 2);
-
+                ctx.fillText('拍摄时间：', labelX, cy + lineH / 2);
                 ctx.fillStyle = '#1a1a1a';
-                ctx.font = (11 * scale) + 'px -apple-system, sans-serif';
-                ctx.fillText(formattedDate + ' ' + time, labelX + 58 * scale, y + lineH / 2);
+                ctx.fillText(date + ' ' + time, valX, cy + lineH / 2);
+                cy += lineH;
 
-                y += lineH;
-
-                // 天气：
                 ctx.fillStyle = '#555555';
-                ctx.font = (11 * scale) + 'px -apple-system, sans-serif';
-                ctx.fillText('天气：', labelX, y + lineH / 2);
-
+                ctx.font = (10 * scale) + 'px -apple-system, sans-serif';
+                ctx.fillText('天气：', labelX, cy + lineH / 2);
                 ctx.fillStyle = '#1a1a1a';
-                ctx.font = (11 * scale) + 'px -apple-system, sans-serif';
-                ctx.fillText(weather + ' 高温 ' + temp + '°C', labelX + 58 * scale, y + lineH / 2);
+                ctx.fillText(weather + ' 高温 ', valX, cy + lineH / 2);
+                ctx.fillStyle = '#e53935';
+                ctx.fillText(temp + '°C', valX + ctx.measureText(weather + ' 高温 ').width, cy + lineH / 2);
+                cy += lineH;
 
-                y += lineH;
-
-                // 地点：
                 ctx.fillStyle = '#555555';
-                ctx.font = (11 * scale) + 'px -apple-system, sans-serif';
-                ctx.fillText('地点：', labelX, y + lineH / 2);
-
+                ctx.font = (10 * scale) + 'px -apple-system, sans-serif';
+                ctx.fillText('地点：', labelX, cy + lineH / 2);
                 ctx.fillStyle = '#1a1a1a';
-                ctx.font = (11 * scale) + 'px -apple-system, sans-serif';
-                ctx.fillText(location, labelX + 58 * scale, y + lineH / 2);
-
-                y += lineH + 2 * scale;
-
-                // ---- 底部 ----
-                const footerY = cardY + cardH - 24 * scale;
-                ctx.strokeStyle = '#e8e8e8';
-                ctx.lineWidth = 1;
-                ctx.beginPath();
-                ctx.moveTo(cardX + 14 * scale, footerY);
-                ctx.lineTo(cardX + cardW - 14 * scale, footerY);
-                ctx.stroke();
-
-                ctx.textBaseline = 'middle';
-
-                if (showAnti) {
-                    ctx.fillStyle = '#1a1a1a';
-                    ctx.font = '500 ' + (11 * scale) + 'px -apple-system, sans-serif';
-                    ctx.textAlign = 'left';
-                    ctx.fillText('今日水印', cardX + 14 * scale, footerY + 12 * scale);
-
-                    ctx.fillStyle = '#999999';
-                    ctx.font = (8 * scale) + 'px -apple-system, sans-serif';
-                    ctx.fillText('相机真实可验', cardX + 14 * scale, footerY + 12 * scale + 12 * scale);
-
-                    ctx.fillStyle = '#bbbbbb';
-                    ctx.font = (8 * scale) + 'px monospace';
-                    ctx.textAlign = 'right';
-                    ctx.fillText('防伪 ' + code, cardX + cardW - 14 * scale, footerY + 12 * scale);
-                } else {
-                    ctx.fillStyle = '#dddddd';
-                    ctx.font = (9 * scale) + 'px -apple-system, sans-serif';
-                    ctx.textAlign = 'right';
-                    ctx.fillText('今日水印', cardX + cardW - 14 * scale, footerY + 12 * scale);
-                }
-
-                ctx.textBaseline = 'alphabetic';
+                ctx.fillText(location, valX, cy + lineH / 2);
             }
 
+            function drawAntiTag(ctx, x, y, w, h, code, scale) {
+                const pad = 10 * scale;
+
+                // 背景
+                ctx.shadowColor = 'rgba(0,0,0,0.4)';
+                ctx.shadowBlur = 12 * scale;
+                ctx.fillStyle = 'rgba(0,0,0,0.65)';
+                ctx.beginPath();
+                ctx.roundRect(x, y, w, h, 6 * scale);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+
+                ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.roundRect(x, y, w, h, 6 * scale);
+                ctx.stroke();
+
+                const cy = y + h / 2;
+
+                // 第一行：今日水印 + 防伪码
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '500 ' + (10 * scale) + 'px -apple-system, sans-serif';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('今日水印', x + pad, cy - 6 * scale);
+
+                ctx.fillStyle = 'rgba(255,255,255,0.25)';
+                ctx.font = (7 * scale) + 'px monospace';
+                ctx.textAlign = 'right';
+                ctx.fillText(code, x + w - pad, cy - 6 * scale);
+
+                // 第二行：相机真实可验
+                ctx.fillStyle = 'rgba(255,255,255,0.4)';
+                ctx.font = (7 * scale) + 'px -apple-system, sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillText('相机真实可验', x + pad, cy + 8 * scale);
+            }
+
+            // roundRect polyfill
             if (!CanvasRenderingContext2D.prototype.roundRect) {
                 CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
                     if (r > w / 2) r = w / 2;
@@ -1246,7 +1381,7 @@
                     canvas.width = imgObj.width;
                     canvas.height = imgObj.height;
                     ctx.drawImage(imgObj, 0, 0);
-                    drawWatermarkOnCanvas(ctx, canvas.width, canvas.height);
+                    drawWatermarksOnCanvas(ctx, canvas.width, canvas.height);
 
                     const link = document.createElement('a');
                     const ts = Date.now();
@@ -1290,7 +1425,7 @@
                     canvas.height = video.videoHeight || 720;
 
                     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                    drawWatermarkOnCanvas(ctx, canvas.width, canvas.height);
+                    drawWatermarksOnCanvas(ctx, canvas.width, canvas.height);
 
                     const link = document.createElement('a');
                     const ts = Date.now();
@@ -1313,12 +1448,21 @@
             }
 
             // ============================================================
+            // 窗口变化重新渲染
+            // ============================================================
+            let resizeTimer;
+            window.addEventListener('resize', function() {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(renderWatermarks, 200);
+            });
+
+            // ============================================================
             // 初始渲染
             // ============================================================
-            updateWatermark();
+            renderWatermarks();
 
-            console.log('📷 今日水印相机 - 像素级还原版 v2');
-            console.log('💡 文字格式：拍摄时间：xxx  天气：xxx  地点：xxx');
+            console.log('📷 今日水印相机 - 可拖动版');
+            console.log('💡 拖拽移动 · 右下角缩放 · 双指缩放');
 
         })();
     </script>
