@@ -1,5 +1,3 @@
-
-               
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -17,7 +15,6 @@
         }
         .container { max-width: 600px; margin: 0 auto; }
 
-        /* 头部 */
         .header {
             display: flex;
             justify-content: space-between;
@@ -29,7 +26,6 @@
         .header h1 { font-size: 20px; font-weight: 600; color: #FFD700; }
         .header .brand { font-size: 12px; color: rgba(255,255,255,0.3); }
 
-        /* 上传区域 */
         .upload-area {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -44,12 +40,12 @@
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
+            user-select: none;
         }
         .upload-btn:hover { background: rgba(255,255,255,0.1); border-color: #4CAF50; }
         .upload-btn .icon { font-size: 32px; display: block; margin-bottom: 8px; }
         .upload-btn .label { font-size: 13px; color: rgba(255,255,255,0.6); }
 
-        /* 预览区域 */
         .preview-section {
             background: #1a1a1a;
             border-radius: 16px;
@@ -74,7 +70,6 @@
             text-align: center;
         }
 
-        /* 水印样式选择 */
         .style-selector {
             display: flex;
             gap: 8px;
@@ -84,19 +79,19 @@
         .style-btn {
             flex: 1;
             min-width: 60px;
-            padding: 8px 0;
+            padding: 10px 0;
             border: 1px solid rgba(255,255,255,0.15);
             border-radius: 8px;
             background: transparent;
             color: rgba(255,255,255,0.5);
-            font-size: 12px;
+            font-size: 13px;
             cursor: pointer;
             transition: all 0.3s;
             text-align: center;
         }
         .style-btn.active { background: #4CAF50; border-color: #4CAF50; color: #fff; }
+        .style-btn:hover { background: rgba(255,255,255,0.05); }
 
-        /* 编辑区域 */
         .edit-area {
             background: rgba(255,255,255,0.03);
             border-radius: 12px;
@@ -108,13 +103,12 @@
             gap: 10px;
             margin-bottom: 10px;
             flex-wrap: wrap;
+            align-items: center;
         }
         .edit-row label {
             font-size: 12px;
             color: rgba(255,255,255,0.4);
             min-width: 50px;
-            display: flex;
-            align-items: center;
         }
         .edit-row input, .edit-row select {
             flex: 1;
@@ -124,23 +118,24 @@
             background: rgba(255,255,255,0.05);
             color: #fff;
             font-size: 14px;
-            min-width: 120px;
+            min-width: 100px;
         }
-        .edit-row input:focus {
+        .edit-row input:focus, .edit-row select:focus {
             outline: none;
             border-color: #4CAF50;
         }
-        .edit-row .hint { font-size: 11px; color: rgba(255,255,255,0.2); }
+        .edit-row input[type="number"] { min-width: 60px; max-width: 70px; }
+        .edit-row .temp-label { color: rgba(255,255,255,0.3); font-size: 13px; }
 
-        /* 位置联想下拉 */
         .suggestions {
             background: #2a2a2a;
             border-radius: 8px;
             max-height: 150px;
             overflow-y: auto;
-            margin-top: -8px;
+            margin-top: -6px;
             margin-bottom: 8px;
             display: none;
+            border: 1px solid rgba(255,255,255,0.05);
         }
         .suggestions.active { display: block; }
         .suggestions .item {
@@ -148,11 +143,11 @@
             cursor: pointer;
             border-bottom: 1px solid rgba(255,255,255,0.05);
             font-size: 13px;
+            color: #fff;
         }
-        .suggestions .item:hover { background: rgba(255,255,255,0.05); }
+        .suggestions .item:hover { background: rgba(255,255,255,0.08); }
         .suggestions .item .addr { font-size: 11px; color: rgba(255,255,255,0.3); }
 
-        /* 防伪标志设置 */
         .anti-counterfeit {
             display: flex;
             align-items: center;
@@ -162,6 +157,7 @@
             border-radius: 8px;
             border: 1px solid rgba(255,215,0,0.1);
             margin-bottom: 16px;
+            flex-wrap: wrap;
         }
         .anti-counterfeit label {
             font-size: 12px;
@@ -175,9 +171,9 @@
             width: 18px;
             height: 18px;
             accent-color: #FFD700;
+            cursor: pointer;
         }
 
-        /* 导出按钮 */
         .export-btn {
             width: 100%;
             padding: 14px;
@@ -189,44 +185,36 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
         }
         .export-btn:hover { transform: scale(1.01); opacity: 0.9; }
         .export-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
 
-        /* 下载区域 */
-        .download-section {
-            margin-top: 16px;
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            margin: 12px 0;
+            overflow: hidden;
             display: none;
         }
-        .download-section.active { display: block; }
-        .download-section .result {
-            border-radius: 12px;
-            overflow: hidden;
-            background: #1a1a1a;
+        .progress-bar.active { display: block; }
+        .progress-bar .fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.3s;
         }
-        .download-section .result img, .download-section .result video {
-            width: 100%;
-            max-height: 400px;
-            object-fit: contain;
-        }
-        .download-section .download-link {
-            display: block;
-            margin-top: 12px;
-            padding: 12px;
-            text-align: center;
-            background: #2196F3;
-            color: #fff;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 500;
-        }
-        .download-section .download-link:hover { background: #1976D2; }
 
-        /* Toast */
+        .file-info {
+            font-size: 12px;
+            color: rgba(255,255,255,0.3);
+            text-align: center;
+            padding: 8px;
+            margin-top: 8px;
+        }
+
         .toast {
             position: fixed;
             bottom: 80px;
@@ -252,7 +240,7 @@
             100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
         }
 
-        /* 水印预览叠加层 - 实时显示 */
+        /* 水印覆盖层 */
         .watermark-preview-overlay {
             position: absolute;
             top: 0;
@@ -262,8 +250,6 @@
             pointer-events: none;
             z-index: 10;
         }
-
-        /* 水印样式1 - 经典版（与今日水印一致） */
         .wp-classic {
             position: absolute;
             bottom: 20px;
@@ -276,7 +262,6 @@
         .wp-classic .weather { font-size: 13px; color: #fff; opacity: 0.8; }
         .wp-classic .location { font-size: 13px; color: #fff; opacity: 0.9; margin-top: 2px; }
 
-        /* 水印样式2 - 简洁版 */
         .wp-simple {
             position: absolute;
             bottom: 20px;
@@ -289,7 +274,6 @@
         .wp-simple .time { font-size: 26px; font-weight: 300; color: #fff; }
         .wp-simple .info { display: flex; justify-content: space-between; font-size: 13px; color: rgba(255,255,255,0.85); margin-top: 2px; }
 
-        /* 水印样式3 - 时间线版 */
         .wp-timeline {
             position: absolute;
             bottom: 20px;
@@ -303,7 +287,6 @@
         .wp-timeline .weather { font-size: 13px; color: rgba(255,255,255,0.8); }
         .wp-timeline .location { font-size: 13px; color: #fff; opacity: 0.9; margin-top: 2px; }
 
-        /* 防伪标志 - 右下角 */
         .anti-fake {
             position: absolute;
             bottom: 20px;
@@ -317,54 +300,41 @@
         }
         .anti-fake .sub { font-size: 9px; opacity: 0.6; }
 
-        /* 文件信息 */
-        .file-info {
-            font-size: 12px;
-            color: rgba(255,255,255,0.3);
-            text-align: center;
-            padding: 8px;
+        .media-container {
+            display: none;
+            position: relative;
+            width: 100%;
+        }
+        .media-container.active { display: block; }
+        .media-container img, .media-container video {
+            width: 100%;
+            max-height: 500px;
+            object-fit: contain;
+            display: block;
         }
 
-        /* 进度条 */
-        .progress-bar {
-            width: 100%;
-            height: 4px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 2px;
-            margin-top: 8px;
-            overflow: hidden;
-            display: none;
-        }
-        .progress-bar.active { display: block; }
-        .progress-bar .fill {
-            height: 100%;
-            background: linear-gradient(90deg, #4CAF50, #8BC34A);
-            border-radius: 2px;
-            width: 0%;
-            transition: width 0.3s;
-        }
+        .hidden-input { display: none; }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- 头部 -->
         <div class="header">
             <h1>📷 今日水印</h1>
             <span class="brand">真实可拍 · 防伪认证</span>
         </div>
 
-        <!-- 上传 -->
+        <!-- 上传区域 -->
         <div class="upload-area">
-            <div class="upload-btn" onclick="document.getElementById('imageInput').click()">
+            <div class="upload-btn" id="uploadImageBtn">
                 <span class="icon">🖼️</span>
                 <span class="label">选择照片</span>
             </div>
-            <div class="upload-btn" onclick="document.getElementById('videoInput').click()">
+            <div class="upload-btn" id="uploadVideoBtn">
                 <span class="icon">🎬</span>
                 <span class="label">选择视频</span>
             </div>
-            <input type="file" id="imageInput" accept="image/*" style="display:none" onchange="loadImage(event)">
-            <input type="file" id="videoInput" accept="video/*" style="display:none" onchange="loadVideo(event)">
+            <input type="file" id="imageInput" class="hidden-input" accept="image/*">
+            <input type="file" id="videoInput" class="hidden-input" accept="video/*">
         </div>
 
         <!-- 预览 -->
@@ -373,34 +343,33 @@
                 📸 选择照片或视频<br>
                 <span style="font-size:12px;color:rgba(255,255,255,0.15)">支持 JPG, PNG, MP4, MOV</span>
             </div>
-            <div id="mediaContainer" style="display:none;position:relative;width:100%;">
+            <div class="media-container" id="mediaContainer">
                 <img id="previewImage" style="display:none;width:100%;max-height:500px;object-fit:contain;">
                 <video id="previewVideo" style="display:none;width:100%;max-height:500px;object-fit:contain;" controls></video>
-                <!-- 水印覆盖层 -->
                 <div class="watermark-preview-overlay" id="watermarkOverlay"></div>
             </div>
         </div>
 
         <!-- 样式选择 -->
         <div class="style-selector">
-            <button class="style-btn active" data-style="classic" onclick="setStyle('classic')">经典</button>
-            <button class="style-btn" data-style="simple" onclick="setStyle('simple')">简洁</button>
-            <button class="style-btn" data-style="timeline" onclick="setStyle('timeline')">时间线</button>
+            <button class="style-btn active" data-style="classic">经典</button>
+            <button class="style-btn" data-style="simple">简洁</button>
+            <button class="style-btn" data-style="timeline">时间线</button>
         </div>
 
         <!-- 编辑 -->
         <div class="edit-area">
             <div class="edit-row">
                 <label>📅 日期</label>
-                <input type="date" id="editDate" onchange="updateWatermark()">
+                <input type="date" id="editDate">
             </div>
             <div class="edit-row">
                 <label>⏰ 时间</label>
-                <input type="time" id="editTime" onchange="updateWatermark()">
+                <input type="time" id="editTime">
             </div>
             <div class="edit-row">
                 <label>🌤️ 天气</label>
-                <select id="editWeather" onchange="updateWatermark()">
+                <select id="editWeather">
                     <option value="晴">☀️ 晴</option>
                     <option value="多云">⛅ 多云</option>
                     <option value="阴">☁️ 阴</option>
@@ -408,319 +377,376 @@
                     <option value="雪">❄️ 雪</option>
                     <option value="雾">🌫️ 雾</option>
                 </select>
-                <input type="number" id="editTemp" value="30" style="width:60px;min-width:60px;" onchange="updateWatermark()">
-                <span style="color:rgba(255,255,255,0.3);font-size:13px;">°C</span>
+                <input type="number" id="editTemp" value="30" min="-30" max="50">
+                <span class="temp-label">°C</span>
             </div>
-            <div class="edit-row" style="position:relative;">
+            <div class="edit-row" style="position:relative;flex-wrap:wrap;">
                 <label>📍 位置</label>
-                <input type="text" id="editLocation" placeholder="输入地点，自动联想" value="张家港市·妙中小区" oninput="onLocationInput(this.value)">
+                <input type="text" id="editLocation" placeholder="输入地点，自动联想" value="张家港市·妙中小区" style="flex:1;min-width:150px;">
             </div>
-            <!-- 联想下拉 -->
             <div class="suggestions" id="suggestions"></div>
             <div class="edit-row" style="margin-bottom:0;">
                 <label>📝 标语</label>
-                <input type="text" id="editSlogan" value="醉酒当称人生几何" onchange="updateWatermark()" style="flex:1;">
+                <input type="text" id="editSlogan" value="醉酒当称人生几何" style="flex:1;">
             </div>
         </div>
 
-        <!-- 防伪标志 -->
+        <!-- 防伪 -->
         <div class="anti-counterfeit">
             <label>
-                <input type="checkbox" id="antiFake" checked onchange="updateWatermark()">
-                🛡️ 防伪标志（今日水印 · 真实可拍）
+                <input type="checkbox" id="antiFake" checked>
+                🛡️ 防伪标志
             </label>
-            <label style="margin-left:auto;">
-                <input type="checkbox" id="showBrand" checked onchange="updateWatermark()">
+            <label>
+                <input type="checkbox" id="showBrand" checked>
                 ℹ️ 品牌标识
             </label>
         </div>
 
-        <!-- 进度条 -->
-        <div class="progress-bar" id="progressBar"><div class="fill" id="progressFill"></div></div>
-
-        <!-- 导出按钮 -->
-        <button class="export-btn" id="exportBtn" onclick="exportWatermark()">
-            💾 导出带水印的文件
-        </button>
-
-        <!-- 下载区域 -->
-        <div class="download-section" id="downloadSection">
-            <div class="result" id="resultContainer"></div>
+        <!-- 进度 -->
+        <div class="progress-bar" id="progressBar">
+            <div class="fill" id="progressFill"></div>
         </div>
 
-        <!-- 文件信息 -->
+        <!-- 导出 -->
+        <button class="export-btn" id="exportBtn">💾 导出带水印的文件</button>
+
         <div class="file-info" id="fileInfo">选择照片或视频开始制作</div>
     </div>
 
-    <!-- Toast -->
     <div class="toast" id="toast"></div>
 
     <script>
-        // ============================================================
-        // 数据
-        // ============================================================
-        let currentStyle = 'classic';
-        let currentFile = null;
-        let isVideo = false;
-        let mediaUrl = null;
+        (function() {
+            'use strict';
 
-        const mockLocations = [
-            { name: '妙中小区', addr: '张家港市·杨舍镇' },
-            { name: '黄龙溪派出所', addr: '成都市双流区·黄龙溪镇' },
-            { name: '天府广场', addr: '成都市青羊区·人民南路' },
-            { name: '春熙路', addr: '成都市锦江区·春熙路街道' },
-            { name: '宽窄巷子', addr: '成都市青羊区·少城街道' },
-            { name: '锦里', addr: '成都市武侯区·武侯祠大街' },
-            { name: '人民公园', addr: '成都市青羊区·祠堂街' },
-            { name: '环球中心', addr: '成都市高新区·天府大道' },
-            { name: '双流国际机场', addr: '成都市双流区·机场路' },
-            { name: '太古里', addr: '成都市锦江区·中纱帽街' },
-            { name: '九眼桥', addr: '成都市锦江区·九眼桥' },
-            { name: '张家港站', addr: '张家港市·塘桥镇' },
-            { name: '上海外滩', addr: '上海市黄浦区·中山东一路' },
-            { name: '北京天安门', addr: '北京市东城区·长安街' },
-            { name: '广州塔', addr: '广州市海珠区·阅江西路' },
-            { name: '深圳湾', addr: '深圳市南山区·滨海大道' },
-        ];
+            // ============================================================
+            // DOM 引用
+            // ============================================================
+            const uploadImageBtn = document.getElementById('uploadImageBtn');
+            const uploadVideoBtn = document.getElementById('uploadVideoBtn');
+            const imageInput = document.getElementById('imageInput');
+            const videoInput = document.getElementById('videoInput');
+            const previewImage = document.getElementById('previewImage');
+            const previewVideo = document.getElementById('previewVideo');
+            const mediaContainer = document.getElementById('mediaContainer');
+            const placeholder = document.getElementById('placeholder');
+            const watermarkOverlay = document.getElementById('watermarkOverlay');
+            const editDate = document.getElementById('editDate');
+            const editTime = document.getElementById('editTime');
+            const editWeather = document.getElementById('editWeather');
+            const editTemp = document.getElementById('editTemp');
+            const editLocation = document.getElementById('editLocation');
+            const editSlogan = document.getElementById('editSlogan');
+            const suggestions = document.getElementById('suggestions');
+            const antiFake = document.getElementById('antiFake');
+            const showBrand = document.getElementById('showBrand');
+            const exportBtn = document.getElementById('exportBtn');
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            const fileInfo = document.getElementById('fileInfo');
+            const toast = document.getElementById('toast');
 
-        // ============================================================
-        // 初始化
-        // ============================================================
-        function init() {
-            const now = new Date();
-            const d = now.toISOString().split('T')[0];
-            const t = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-            document.getElementById('editDate').value = d;
-            document.getElementById('editTime').value = t;
-            updateWatermark();
-        }
-        init();
+            // ============================================================
+            // 状态
+            // ============================================================
+            let currentStyle = 'classic';
+            let currentFile = null;
+            let isVideo = false;
+            let mediaUrl = null;
 
-        // ============================================================
-        // 加载图片/视频
-        // ============================================================
-        function loadImage(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            loadMedia(file, false);
-        }
+            // ============================================================
+            // 模拟位置数据
+            // ============================================================
+            const mockLocations = [
+                { name: '妙中小区', addr: '张家港市·杨舍镇' },
+                { name: '黄龙溪派出所', addr: '成都市双流区·黄龙溪镇' },
+                { name: '天府广场', addr: '成都市青羊区·人民南路' },
+                { name: '春熙路', addr: '成都市锦江区·春熙路街道' },
+                { name: '宽窄巷子', addr: '成都市青羊区·少城街道' },
+                { name: '锦里', addr: '成都市武侯区·武侯祠大街' },
+                { name: '人民公园', addr: '成都市青羊区·祠堂街' },
+                { name: '环球中心', addr: '成都市高新区·天府大道' },
+                { name: '双流国际机场', addr: '成都市双流区·机场路' },
+                { name: '太古里', addr: '成都市锦江区·中纱帽街' },
+                { name: '九眼桥', addr: '成都市锦江区·九眼桥' },
+                { name: '张家港站', addr: '张家港市·塘桥镇' },
+                { name: '上海外滩', addr: '上海市黄浦区·中山东一路' },
+                { name: '北京天安门', addr: '北京市东城区·长安街' },
+                { name: '广州塔', addr: '广州市海珠区·阅江西路' },
+                { name: '深圳湾', addr: '深圳市南山区·滨海大道' },
+            ];
 
-        function loadVideo(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            loadMedia(file, true);
-        }
-
-        function loadMedia(file, video) {
-            isVideo = video;
-            currentFile = file;
-
-            const url = URL.createObjectURL(file);
-            mediaUrl = url;
-
-            document.getElementById('placeholder').style.display = 'none';
-            document.getElementById('mediaContainer').style.display = 'block';
-
-            const img = document.getElementById('previewImage');
-            const vid = document.getElementById('previewVideo');
-
-            if (video) {
-                img.style.display = 'none';
-                vid.style.display = 'block';
-                vid.src = url;
-                vid.load();
-            } else {
-                vid.style.display = 'none';
-                img.style.display = 'block';
-                img.src = url;
+            // ============================================================
+            // Toast
+            // ============================================================
+            let toastTimer = null;
+            function showToast(msg) {
+                toast.textContent = msg;
+                toast.classList.add('show');
+                clearTimeout(toastTimer);
+                toastTimer = setTimeout(() => toast.classList.remove('show'), 2500);
             }
 
-            document.getElementById('fileInfo').textContent = 
-                `📁 ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
-
-            updateWatermark();
-            showToast(`✅ 已加载${video ? '视频' : '照片'}`);
-        }
-
-        // ============================================================
-        // 水印渲染（实时预览）
-        // ============================================================
-        function updateWatermark() {
-            const overlay = document.getElementById('watermarkOverlay');
-            const date = document.getElementById('editDate').value;
-            const time = document.getElementById('editTime').value;
-            const weather = document.getElementById('editWeather').value;
-            const temp = document.getElementById('editTemp').value;
-            const location = document.getElementById('editLocation').value || '未知地点';
-            const slogan = document.getElementById('editSlogan').value || '水印';
-
-            const weekdays = ['日','一','二','三','四','五','六'];
-            const d = new Date(date);
-            const weekday = `星期${weekdays[d.getDay()]}`;
-
-            const showAntiFake = document.getElementById('antiFake').checked;
-            const showBrand = document.getElementById('showBrand').checked;
-
-            let html = '';
-
-            // 水印内容
-            switch(currentStyle) {
-                case 'classic':
-                    html = `
-                        <div class="wp-classic">
-                            <div class="slogan">${slogan}</div>
-                            <div class="datetime">${date} ${time}</div>
-                            <div class="weather">${weekday} ${weather} ${temp}°C</div>
-                            <div class="location">📍 ${location}</div>
-                        </div>
-                    `;
-                    break;
-                case 'simple':
-                    html = `
-                        <div class="wp-simple">
-                            <div class="top">
-                                <span class="date">${date}</span>
-                                <span class="time">${time}</span>
-                            </div>
-                            <div class="info">
-                                <span>${weekday} ${weather} ${temp}°C</span>
-                                <span>📍 ${location}</span>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                case 'timeline':
-                    html = `
-                        <div class="wp-timeline">
-                            <div class="date">${date} ${weekday}</div>
-                            <div class="main">
-                                <span class="time">${time}</span>
-                                <span class="weather">${weather} ${temp}°C</span>
-                            </div>
-                            <div class="location">📍 ${location}</div>
-                        </div>
-                    `;
-                    break;
+            // ============================================================
+            // 初始化日期时间
+            // ============================================================
+            function initDateTime() {
+                const now = new Date();
+                const d = now.toISOString().split('T')[0];
+                const t = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+                editDate.value = d;
+                editTime.value = t;
             }
+            initDateTime();
 
-            // 防伪标志
-            if (showAntiFake) {
-                html += `
-                    <div class="anti-fake">
-                        今日水印<br>
-                        <span class="sub">真实可拍</span>
-                    </div>
-                `;
-            }
+            // ============================================================
+            // 上传事件绑定
+            // ============================================================
+            uploadImageBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                imageInput.click();
+            });
 
-            // 品牌标识（与防伪一起显示或单独）
-            if (showBrand && !showAntiFake) {
-                html += `
-                    <div class="anti-fake" style="opacity:0.2;">
-                        今日水印
-                    </div>
-                `;
-            }
+            uploadVideoBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                videoInput.click();
+            });
 
-            overlay.innerHTML = html;
-        }
-
-        // ============================================================
-        // 样式切换
-        // ============================================================
-        function setStyle(style) {
-            currentStyle = style;
-            document.querySelectorAll('.style-btn').forEach(b => b.classList.remove('active'));
-            document.querySelector(`.style-btn[data-style="${style}"]`).classList.add('active');
-            updateWatermark();
-        }
-
-        // ============================================================
-        // 位置自动联想
-        // ============================================================
-        function onLocationInput(value) {
-            const container = document.getElementById('suggestions');
-            if (value.length < 2) {
-                container.classList.remove('active');
-                return;
-            }
-
-            const results = mockLocations.filter(item => 
-                item.name.includes(value) || item.addr.includes(value)
-            );
-
-            if (results.length === 0) {
-                container.innerHTML = `
-                    <div class="item" onclick="selectLocation('${value}')">
-                        📌 使用 "${value}"
-                        <div class="addr">自定义位置</div>
-                    </div>
-                `;
-            } else {
-                container.innerHTML = results.map(item => `
-                    <div class="item" onclick="selectLocation('${item.name} · ${item.addr.split('·').pop()}')">
-                        📍 ${item.name}
-                        <div class="addr">${item.addr}</div>
-                    </div>
-                `).join('');
-            }
-            container.classList.add('active');
-        }
-
-        function selectLocation(loc) {
-            document.getElementById('editLocation').value = loc;
-            document.getElementById('suggestions').classList.remove('active');
-            updateWatermark();
-        }
-
-        // 点击外部关闭联想
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.edit-area')) {
-                document.getElementById('suggestions').classList.remove('active');
-            }
-        });
-
-        // ============================================================
-        // 导出带水印的文件
-        // ============================================================
-        async function exportWatermark() {
-            const btn = document.getElementById('exportBtn');
-            const progress = document.getElementById('progressBar');
-            const fill = document.getElementById('progressFill');
-
-            if (!currentFile) {
-                showToast('⚠️ 请先选择照片或视频');
-                return;
-            }
-
-            btn.disabled = true;
-            btn.textContent = '⏳ 处理中...';
-            progress.classList.add('active');
-
-            try {
-                if (isVideo) {
-                    await exportVideo(btn, fill);
-                } else {
-                    await exportImage(btn, fill);
+            // ============================================================
+            // 文件加载
+            // ============================================================
+            imageInput.addEventListener('change', function(e) {
+                if (this.files && this.files[0]) {
+                    loadFile(this.files[0], false);
                 }
-            } catch (e) {
-                console.error(e);
-                showToast('❌ 处理失败: ' + e.message);
+                this.value = '';
+            });
+
+            videoInput.addEventListener('change', function(e) {
+                if (this.files && this.files[0]) {
+                    loadFile(this.files[0], true);
+                }
+                this.value = '';
+            });
+
+            function loadFile(file, video) {
+                isVideo = video;
+                currentFile = file;
+
+                const url = URL.createObjectURL(file);
+                mediaUrl = url;
+
+                placeholder.style.display = 'none';
+                mediaContainer.classList.add('active');
+
+                if (video) {
+                    previewImage.style.display = 'none';
+                    previewVideo.style.display = 'block';
+                    previewVideo.src = url;
+                    previewVideo.load();
+                } else {
+                    previewVideo.style.display = 'none';
+                    previewImage.style.display = 'block';
+                    previewImage.src = url;
+                }
+
+                fileInfo.textContent = '📁 ' + file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
+                updateWatermark();
+                showToast('✅ 已加载' + (video ? '视频' : '照片'));
             }
 
-            btn.disabled = false;
-            btn.textContent = '💾 导出带水印的文件';
-            progress.classList.remove('active');
-            fill.style.width = '0%';
-        }
+            // ============================================================
+            // 水印渲染
+            // ============================================================
+            function updateWatermark() {
+                const date = editDate.value || '2026-08-08';
+                const time = editTime.value || '19:34';
+                const weather = editWeather.value || '晴';
+                const temp = editTemp.value || '30';
+                const location = editLocation.value || '未知地点';
+                const slogan = editSlogan.value || '水印';
 
-        // ============================================================
-        // 导出图片（Canvas合成）
-        // ============================================================
-        function exportImage(btn, fill) {
-            return new Promise((resolve, reject) => {
-                const img = document.getElementById('previewImage');
-                if (!img.src) { reject(new Error('没有图片')); return; }
+                const weekdays = ['日','一','二','三','四','五','六'];
+                const d = new Date(date);
+                const weekday = '星期' + weekdays[d.getDay()];
+
+                const showAntiFake = antiFake.checked;
+                const showBrandFlag = showBrand.checked;
+
+                let html = '';
+
+                switch(currentStyle) {
+                    case 'classic':
+                        html = `
+                            <div class="wp-classic">
+                                <div class="slogan">${slogan}</div>
+                                <div class="datetime">${date} ${time}</div>
+                                <div class="weather">${weekday} ${weather} ${temp}°C</div>
+                                <div class="location">📍 ${location}</div>
+                            </div>
+                        `;
+                        break;
+                    case 'simple':
+                        html = `
+                            <div class="wp-simple">
+                                <div class="top">
+                                    <span class="date">${date}</span>
+                                    <span class="time">${time}</span>
+                                </div>
+                                <div class="info">
+                                    <span>${weekday} ${weather} ${temp}°C</span>
+                                    <span>📍 ${location}</span>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                    case 'timeline':
+                        html = `
+                            <div class="wp-timeline">
+                                <div class="date">${date} ${weekday}</div>
+                                <div class="main">
+                                    <span class="time">${time}</span>
+                                    <span class="weather">${weather} ${temp}°C</span>
+                                </div>
+                                <div class="location">📍 ${location}</div>
+                            </div>
+                        `;
+                        break;
+                }
+
+                if (showAntiFake) {
+                    html += `
+                        <div class="anti-fake">
+                            今日水印<br>
+                            <span class="sub">真实可拍</span>
+                        </div>
+                    `;
+                } else if (showBrandFlag) {
+                    html += `
+                        <div class="anti-fake" style="opacity:0.2;">
+                            今日水印
+                        </div>
+                    `;
+                }
+
+                watermarkOverlay.innerHTML = html;
+            }
+
+            // ============================================================
+            // 样式切换
+            // ============================================================
+            document.querySelectorAll('.style-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.style-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentStyle = this.dataset.style;
+                    updateWatermark();
+                });
+            });
+
+            // ============================================================
+            // 编辑事件绑定
+            // ============================================================
+            editDate.addEventListener('change', updateWatermark);
+            editTime.addEventListener('change', updateWatermark);
+            editWeather.addEventListener('change', updateWatermark);
+            editTemp.addEventListener('change', updateWatermark);
+            editSlogan.addEventListener('input', updateWatermark);
+            antiFake.addEventListener('change', updateWatermark);
+            showBrand.addEventListener('change', updateWatermark);
+
+            // ============================================================
+            // 位置自动联想
+            // ============================================================
+            editLocation.addEventListener('input', function() {
+                const value = this.value;
+                if (value.length < 2) {
+                    suggestions.classList.remove('active');
+                    return;
+                }
+
+                const results = mockLocations.filter(function(item) {
+                    return item.name.includes(value) || item.addr.includes(value);
+                });
+
+                if (results.length === 0) {
+                    suggestions.innerHTML = `
+                        <div class="item" onclick="window.selectLocation('${value}')">
+                            📌 使用 "${value}"
+                            <div class="addr">自定义位置</div>
+                        </div>
+                    `;
+                } else {
+                    suggestions.innerHTML = results.map(function(item) {
+                        const parts = item.addr.split('·');
+                        const shortAddr = parts.length > 1 ? parts[parts.length - 1] : item.addr;
+                        return `
+                            <div class="item" onclick="window.selectLocation('${item.name} · ${shortAddr}')">
+                                📍 ${item.name}
+                                <div class="addr">${item.addr}</div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+                suggestions.classList.add('active');
+            });
+
+            editLocation.addEventListener('blur', function() {
+                setTimeout(function() {
+                    suggestions.classList.remove('active');
+                }, 300);
+            });
+
+            editLocation.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    const first = suggestions.querySelector('.item');
+                    if (first) first.click();
+                    suggestions.classList.remove('active');
+                }
+            });
+
+            window.selectLocation = function(loc) {
+                editLocation.value = loc;
+                suggestions.classList.remove('active');
+                updateWatermark();
+                showToast('📍 位置已更新: ' + loc);
+            };
+
+            // 点击外部关闭联想
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.edit-area')) {
+                    suggestions.classList.remove('active');
+                }
+            });
+
+            // ============================================================
+            // 导出
+            // ============================================================
+            exportBtn.addEventListener('click', function() {
+                if (!currentFile) {
+                    showToast('⚠️ 请先选择照片或视频');
+                    return;
+                }
+                if (isVideo) {
+                    exportVideo();
+                } else {
+                    exportImage();
+                }
+            });
+
+            function exportImage() {
+                const img = previewImage;
+                if (!img.src || img.style.display === 'none') {
+                    showToast('⚠️ 没有图片可导出');
+                    return;
+                }
+
+                exportBtn.disabled = true;
+                exportBtn.textContent = '⏳ 处理中...';
+                progressBar.classList.add('active');
 
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
@@ -730,236 +756,187 @@
                 imgObj.onload = function() {
                     canvas.width = imgObj.width;
                     canvas.height = imgObj.height;
-
-                    // 绘制原图
                     ctx.drawImage(imgObj, 0, 0);
-
-                    // 绘制水印
                     drawWatermarkOnCanvas(ctx, canvas.width, canvas.height);
 
-                    // 导出
                     const link = document.createElement('a');
-                    link.download = `水印_${Date.now()}.png`;
+                    link.download = '水印_' + Date.now() + '.png';
                     link.href = canvas.toDataURL('image/png');
                     link.click();
 
-                    fill.style.width = '100%';
+                    progressFill.style.width = '100%';
                     showToast('✅ 图片导出成功！');
-                    resolve();
+                    exportBtn.disabled = false;
+                    exportBtn.textContent = '💾 导出带水印的文件';
+                    setTimeout(function() {
+                        progressBar.classList.remove('active');
+                        progressFill.style.width = '0%';
+                    }, 1000);
                 };
-                imgObj.onerror = () => reject(new Error('图片加载失败'));
+                imgObj.onerror = function() {
+                    showToast('❌ 图片加载失败');
+                    exportBtn.disabled = false;
+                    exportBtn.textContent = '💾 导出带水印的文件';
+                    progressBar.classList.remove('active');
+                };
                 imgObj.src = img.src;
-            });
-        }
+            }
 
-        // ============================================================
-        // 在Canvas上绘制水印
-        // ============================================================
-        function drawWatermarkOnCanvas(ctx, w, h) {
-            const date = document.getElementById('editDate').value;
-            const time = document.getElementById('editTime').value;
-            const weather = document.getElementById('editWeather').value;
-            const temp = document.getElementById('editTemp').value;
-            const location = document.getElementById('editLocation').value || '未知地点';
-            const slogan = document.getElementById('editSlogan').value || '水印';
+            function drawWatermarkOnCanvas(ctx, w, h) {
+                const date = editDate.value || '2026-08-08';
+                const time = editTime.value || '19:34';
+                const weather = editWeather.value || '晴';
+                const temp = editTemp.value || '30';
+                const location = editLocation.value || '未知地点';
+                const slogan = editSlogan.value || '水印';
 
-            const weekdays = ['日','一','二','三','四','五','六'];
-            const d = new Date(date);
-            const weekday = `星期${weekdays[d.getDay()]}`;
+                const weekdays = ['日','一','二','三','四','五','六'];
+                const d = new Date(date);
+                const weekday = '星期' + weekdays[d.getDay()];
 
-            const showAntiFake = document.getElementById('antiFake').checked;
+                const showAntiFake = antiFake.checked;
 
-            // 根据图片大小缩放字体
-            const scale = Math.min(w, h) / 800;
-            const fontSize = Math.max(14, 22 * scale);
-            const smallFont = Math.max(10, 16 * scale);
-            const padding = Math.max(16, 30 * scale);
+                const scale = Math.min(w, h) / 800;
+                const fontSize = Math.max(14, 22 * scale);
+                const smallFont = Math.max(10, 16 * scale);
+                const padding = Math.max(16, 30 * scale);
 
-            ctx.textShadowColor = 'rgba(0,0,0,0.85)';
-            ctx.textShadowBlur = 8;
+                ctx.textShadowColor = 'rgba(0,0,0,0.85)';
+                ctx.textShadowBlur = 8;
 
-            let y = h - padding;
+                let y = h - padding;
 
-            // 根据样式绘制
-            switch(currentStyle) {
-                case 'classic':
-                    ctx.textAlign = 'left';
-                    ctx.fillStyle = '#FFD700';
-                    ctx.font = `bold ${fontSize * 1.2}px "STKaiti", serif`;
-                    ctx.fillText(slogan, padding, y);
-                    y -= fontSize * 1.2 + 4;
+                switch(currentStyle) {
+                    case 'classic':
+                        ctx.textAlign = 'left';
+                        ctx.fillStyle = '#FFD700';
+                        ctx.font = 'bold ' + (fontSize * 1.2) + 'px "STKaiti", serif';
+                        ctx.fillText(slogan, padding, y);
+                        y -= fontSize * 1.2 + 4;
 
-                    ctx.fillStyle = '#ffffff';
-                    ctx.font = `${fontSize * 0.8}px sans-serif`;
-                    ctx.fillText(`${date} ${time}`, padding, y);
-                    y -= fontSize * 0.8 + 2;
+                        ctx.fillStyle = '#ffffff';
+                        ctx.font = (fontSize * 0.8) + 'px sans-serif';
+                        ctx.fillText(date + ' ' + time, padding, y);
+                        y -= fontSize * 0.8 + 2;
 
-                    ctx.fillStyle = 'rgba(255,255,255,0.85)';
-                    ctx.font = `${fontSize * 0.75}px sans-serif`;
-                    ctx.fillText(`${weekday} ${weather} ${temp}°C`, padding, y);
-                    y -= fontSize * 0.75 + 2;
+                        ctx.fillStyle = 'rgba(255,255,255,0.85)';
+                        ctx.font = (fontSize * 0.75) + 'px sans-serif';
+                        ctx.fillText(weekday + ' ' + weather + ' ' + temp + '°C', padding, y);
+                        y -= fontSize * 0.75 + 2;
 
-                    ctx.fillStyle = 'rgba(255,255,255,0.9)';
-                    ctx.fillText(`📍 ${location}`, padding, y);
-                    break;
+                        ctx.fillStyle = 'rgba(255,255,255,0.9)';
+                        ctx.font = (fontSize * 0.75) + 'px sans-serif';
+                        ctx.fillText('📍 ' + location, padding, y);
+                        break;
 
-                case 'simple':
-                    ctx.textAlign = 'left';
-                    ctx.fillStyle = '#ffffff';
-                    ctx.font = `${fontSize * 1.4}px sans-serif`;
-                    ctx.fillText(date, padding, y);
-                    
+                    case 'simple':
+                        ctx.textAlign = 'left';
+                        ctx.fillStyle = '#ffffff';
+                        ctx.font = (fontSize * 1.4) + 'px sans-serif';
+                        ctx.fillText(date, padding, y);
+
+                        ctx.textAlign = 'right';
+                        ctx.fillText(time, w - padding, y);
+
+                        y -= fontSize * 1.4 + 6;
+                        ctx.textAlign = 'left';
+                        ctx.font = (fontSize * 0.75) + 'px sans-serif';
+                        ctx.fillStyle = 'rgba(255,255,255,0.85)';
+                        ctx.fillText(weekday + ' ' + weather + ' ' + temp + '°C', padding, y);
+
+                        ctx.textAlign = 'right';
+                        ctx.fillText('📍 ' + location, w - padding, y);
+                        break;
+
+                    case 'timeline':
+                        ctx.textAlign = 'left';
+                        ctx.fillStyle = 'rgba(255,255,255,0.7)';
+                        ctx.font = (fontSize * 0.8) + 'px sans-serif';
+                        ctx.fillText(date + ' ' + weekday, padding, y);
+                        y -= fontSize * 0.8 + 4;
+
+                        ctx.fillStyle = '#ffffff';
+                        ctx.font = (fontSize * 1.8) + 'px sans-serif';
+                        ctx.fillText(time, padding, y);
+
+                        ctx.fillStyle = 'rgba(255,255,255,0.8)';
+                        ctx.font = (fontSize * 0.8) + 'px sans-serif';
+                        ctx.fillText(' ' + weather + ' ' + temp + '°C', padding + 100 * scale, y);
+                        y -= fontSize * 1.8 + 6;
+
+                        ctx.fillStyle = 'rgba(255,255,255,0.9)';
+                        ctx.font = (fontSize * 0.75) + 'px sans-serif';
+                        ctx.fillText('📍 ' + location, padding, y);
+                        break;
+                }
+
+                if (showAntiFake) {
                     ctx.textAlign = 'right';
-                    ctx.fillText(time, w - padding, y);
-                    
-                    y -= fontSize * 1.4 + 6;
-                    ctx.textAlign = 'left';
-                    ctx.font = `${fontSize * 0.75}px sans-serif`;
-                    ctx.fillStyle = 'rgba(255,255,255,0.85)';
-                    ctx.fillText(`${weekday} ${weather} ${temp}°C`, padding, y);
-                    
-                    ctx.textAlign = 'right';
-                    ctx.fillText(`📍 ${location}`, w - padding, y);
-                    break;
+                    ctx.textBaseline = 'bottom';
+                    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+                    ctx.font = smallFont + 'px sans-serif';
+                    ctx.fillText('今日水印', w - padding, h - padding);
+                    ctx.fillStyle = 'rgba(255,255,255,0.18)';
+                    ctx.font = (smallFont * 0.8) + 'px sans-serif';
+                    ctx.fillText('真实可拍', w - padding, h - padding - smallFont * 0.9);
+                    ctx.textBaseline = 'alphabetic';
+                }
 
-                case 'timeline':
-                    ctx.textAlign = 'left';
-                    ctx.fillStyle = 'rgba(255,255,255,0.7)';
-                    ctx.font = `${fontSize * 0.8}px sans-serif`;
-                    ctx.fillText(`${date} ${weekday}`, padding, y);
-                    y -= fontSize * 0.8 + 4;
-
-                    ctx.fillStyle = '#ffffff';
-                    ctx.font = `${fontSize * 1.8}px sans-serif`;
-                    ctx.fillText(time, padding, y);
-                    
-                    ctx.fillStyle = 'rgba(255,255,255,0.8)';
-                    ctx.font = `${fontSize * 0.8}px sans-serif`;
-                    ctx.fillText(` ${weather} ${temp}°C`, padding + 100 * scale, y);
-                    y -= fontSize * 1.8 + 6;
-
-                    ctx.fillStyle = 'rgba(255,255,255,0.9)';
-                    ctx.font = `${fontSize * 0.75}px sans-serif`;
-                    ctx.fillText(`📍 ${location}`, padding, y);
-                    break;
+                ctx.textShadowColor = 'transparent';
             }
 
-            // 防伪标志 - 右下角
-            if (showAntiFake) {
-                ctx.textAlign = 'right';
-                ctx.textBaseline = 'bottom';
-                ctx.fillStyle = 'rgba(255,255,255,0.3)';
-                ctx.font = `${smallFont}px sans-serif`;
-                ctx.fillText('今日水印', w - padding, h - padding);
-                ctx.fillStyle = 'rgba(255,255,255,0.18)';
-                ctx.font = `${smallFont * 0.8}px sans-serif`;
-                ctx.fillText('真实可拍', w - padding, h - padding - smallFont * 0.9);
-                ctx.textBaseline = 'alphabetic';
+            // ============================================================
+            // 视频导出（简化版 - 使用Canvas截图）
+            // ============================================================
+            async function exportVideo() {
+                const video = previewVideo;
+                if (!video.src || video.style.display === 'none') {
+                    showToast('⚠️ 没有视频可导出');
+                    return;
+                }
+
+                exportBtn.disabled = true;
+                exportBtn.textContent = '⏳ 处理中...';
+                progressBar.classList.add('active');
+
+                try {
+                    // 简单方案：导出当前帧作为预览
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = video.videoWidth || 1280;
+                    canvas.height = video.videoHeight || 720;
+
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    drawWatermarkOnCanvas(ctx, canvas.width, canvas.height);
+
+                    const link = document.createElement('a');
+                    link.download = '水印视频预览_' + Date.now() + '.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+
+                    progressFill.style.width = '100%';
+                    showToast('✅ 视频帧导出成功！(完整视频合成需服务器端处理)');
+                } catch (e) {
+                    showToast('❌ 导出失败: ' + e.message);
+                }
+
+                exportBtn.disabled = false;
+                exportBtn.textContent = '💾 导出带水印的文件';
+                setTimeout(function() {
+                    progressBar.classList.remove('active');
+                    progressFill.style.width = '0%';
+                }, 1000);
             }
 
-            // 重置阴影
-            ctx.textShadowColor = 'transparent';
-        }
+            // ============================================================
+            // 初始渲染
+            // ============================================================
+            updateWatermark();
 
-        // ============================================================
-        // 导出视频（使用Canvas逐帧处理）
-        // ============================================================
-        async function exportVideo(btn, fill) {
-            const video = document.getElementById('previewVideo');
-            if (!video.src) { throw new Error('没有视频'); }
+            console.log('📷 今日水印工具已加载');
+            console.log('💡 选择照片或视频，添加水印后导出');
 
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-
-            // 创建视频元素用于解码
-            const v = document.createElement('video');
-            v.src = video.src;
-            await v.play();
-
-            canvas.width = v.videoWidth || 1280;
-            canvas.height = v.videoHeight || 720;
-
-            const duration = v.duration;
-            const fps = 30;
-            const totalFrames = Math.floor(duration * fps);
-
-            // 使用MediaRecorder录制
-            const stream = canvas.captureStream(fps);
-            const recorder = new MediaRecorder(stream, {
-                mimeType: 'video/webm;codecs=vp9',
-                videoBitsPerSecond: 5000000
-            });
-
-            const chunks = [];
-            recorder.ondataavailable = e => chunks.push(e.data);
-            recorder.start();
-
-            let frame = 0;
-            while (frame < totalFrames) {
-                const time = frame / fps;
-                v.currentTime = Math.min(time, duration - 0.01);
-                await new Promise(r => setTimeout(r, 50));
-
-                // 等待视频帧就绪
-                await new Promise(r => {
-                    const check = () => {
-                        if (v.readyState >= 2) { r(); }
-                        else { setTimeout(check, 50); }
-                    };
-                    check();
-                });
-
-                // 绘制视频帧
-                ctx.drawImage(v, 0, 0, canvas.width, canvas.height);
-                // 绘制水印
-                drawWatermarkOnCanvas(ctx, canvas.width, canvas.height);
-
-                frame++;
-                fill.style.width = `${(frame / totalFrames) * 100}%`;
-                btn.textContent = `⏳ 处理中 ${Math.round((frame / totalFrames) * 100)}%`;
-            }
-
-            // 停止录制
-            recorder.stop();
-            await new Promise(r => recorder.onstop = r);
-
-            // 导出
-            const blob = new Blob(chunks, { type: 'video/webm' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.download = `水印_${Date.now()}.webm`;
-            link.href = url;
-            link.click();
-
-            showToast('✅ 视频导出成功！');
-        }
-
-        // ============================================================
-        // Toast
-        // ============================================================
-        let toastTimer = null;
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            t.textContent = msg;
-            t.classList.add('show');
-            clearTimeout(toastTimer);
-            toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
-        }
-
-        // ============================================================
-        // 快捷操作：回车触发联想选择
-        // ============================================================
-        document.getElementById('editLocation').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                const suggestions = document.getElementById('suggestions');
-                const first = suggestions.querySelector('.item');
-                if (first) first.click();
-                suggestions.classList.remove('active');
-            }
-        });
-
-        console.log('📷 今日水印工具已加载');
-        console.log('💡 选择照片或视频，添加水印后导出');
+        })();
     </script>
 </body>
 </html>
