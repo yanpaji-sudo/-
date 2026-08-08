@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>今日水印相机</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #000;
+            color: #fff;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* 主相机界面 */
+        .camera-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background: #1a1a1a;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 预览区域 */
+        .preview-area {
+            flex: 1;
+            position: relative;
+            background: #2a2a2a;
+            overflow: hidden;
+        }
+
+        /* 模拟相机预览 */
+        .camera-preview {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a3a4a 0%, #2a5a6a 50%, #1a3a4a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .camera-preview::before {
+            content: '📷 相机预览';
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 24px;
+            letter-spacing: 2px;
+        }
+
+        /* 水印覆盖层 - 完全匹配需求 */
+        .watermark-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+        }
+
+        /* 水印样式1 - 经典版 */
+        .watermark-style-1 {
+            position: absolute;
+            bottom: 30px;
+            left: 20px;
+            right: 20px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            pointer-events: none;
+        }
+
+        .watermark-style-1 .slogan {
+            font-size: 22px;
+            font-weight: bold;
+            color: #FFD700;
+            letter-spacing: 2px;
+            margin-bottom: 4px;
+            font-family: 'STKaiti', 'KaiTi', serif;
+        }
+
+        .watermark-style-1 .datetime {
+            font-size: 15px;
+            color: #fff;
+            opacity: 0.9;
+            margin-bottom: 2px;
+            font-weight: 500;
+        }
+
+        .watermark-style-1 .weather {
+            font-size: 14px;
+            color: #fff;
+            opacity: 0.85;
+            margin-bottom: 2px;
+        }
+
+        .watermark-style-1 .location {
+            font-size: 14px;
+            color: #fff;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            pointer-events: auto;
+            cursor: pointer;
+            background: rgba(0,0,0,0.3);
+            padding: 4px 10px;
+            border-radius: 4px;
+            margin-top: 2px;
+            max-width: 100%;
+        }
+
+        .watermark-style-1 .location .edit-icon {
+            font-size: 12px;
+            opacity: 0.6;
+        }
+
+        /* 品牌标识 - 右下角 */
+        .brand-watermark {
+            position: absolute;
+            bottom: 30px;
+            right: 20px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 12px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            text-align: right;
+            line-height: 1.4;
+            pointer-events: none;
+        }
+
+        .brand-watermark .sub {
+            font-size: 10px;
+            opacity: 0.6;
+        }
+
+        /* 水印样式2 - 简洁版 */
+        .watermark-style-2 {
+            position: absolute;
+            bottom: 30px;
+            left: 20px;
+            right: 20px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            pointer-events: none;
+        }
+
+        .watermark-style-2 .top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 4px;
+        }
+
+        .watermark-style-2 .date-main {
+            font-size: 28px;
+            font-weight: 300;
+            color: #fff;
+            letter-spacing: 1px;
+        }
+
+        .watermark-style-2 .time-main {
+            font-size: 28px;
+            font-weight: 300;
+            color: #fff;
+        }
+
+        .watermark-style-2 .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: rgba(255,255,255,0.85);
+            margin-top: 2px;
+        }
+
+        .watermark-style-2 .location-main {
+            font-size: 14px;
+            color: #fff;
+            opacity: 0.9;
+            pointer-events: auto;
+            cursor: pointer;
+            background: rgba(0,0,0,0.3);
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+
+        /* 水印样式3 - 时间线版 */
+        .watermark-style-3 {
+            position: absolute;
+            bottom: 30px;
+            left: 20px;
+            right: 20px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            pointer-events: none;
+        }
+
+        .watermark-style-3 .timeline-date {
+            font-size: 16px;
+            color: rgba(255,255,255,0.7);
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+        }
+
+        .watermark-style-3 .timeline-main {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            margin-bottom: 4px;
+        }
+
+        .watermark-style-3 .timeline-time {
+            font-size: 36px;
+            font-weight: 200;
+            color: #fff;
+        }
+
+        .watermark-style-3 .timeline-weather {
+            font-size: 14px;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .watermark-style-3 .timeline-location {
+            font-size: 14px;
+            color: #fff;
+            opacity: 0.9;
+            pointer-events: auto;
+            cursor: pointer;
+            background: rgba(0,0,0,0.3);
+            padding: 4px 10px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        /* 位置联想下拉框 */
+        .location-autocomplete {
+            position: absolute;
+            bottom: 100px;
+            left: 20px;
+            right: 20px;
+            background: rgba(30, 30, 30, 0.95);
+            border-radius: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+            z-index: 100;
+            pointer-events: auto;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+        }
+
+        .location-autocomplete.active {
+            display: block;
+        }
+
+        .location-autocomplete .suggestion-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer;
+            pointer-events: auto;
+            transition: background 0.2s;
+        }
+
+        .location-autocomplete .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .location-autocomplete .suggestion-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .location-autocomplete .suggestion-item .name {
+            font-size: 15px;
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .location-autocomplete .suggestion-item .address {
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 2px;
+        }
+
+        /* 控制栏 */
+        .controls {
+            background: rgba(0,0,0,0.9);
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .controls .style-selector {
+            display: flex;
+            gap: 8px;
+        }
+
+        .controls .style-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            pointer-events: auto;
+        }
+
+        .controls .style-btn.active {
+            background: #4CAF50;
+            border-color: #4CAF50;
+        }
+
+        .controls .style-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .controls .action-buttons {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .controls .capture-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: #fff;
+            border: 3px solid rgba(255,255,255,0.3);
+            cursor: pointer;
+            pointer-events: auto;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .controls .capture-btn:hover {
+            transform: scale(1.05);
+            border-color: #4CAF50;
+        }
+
+        .controls .capture-btn.video-mode {
+            background: #ff4444;
+            border-color: #ff4444;
+        }
+
+        .controls .mode-toggle {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 11px;
+            cursor: pointer;
+            pointer-events: auto;
+        }
+
+        .controls .mode-toggle.active {
+            background: #4CAF50;
+        }
+
+        /* 滚动条美化 */
+        .location-autocomplete::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .location-autocomplete::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .location-autocomplete::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 480px) {
+            .watermark-style-1 .slogan {
+                font-size: 18px;
+            }
+            .watermark-style-2 .date-main,
+            .watermark-style-2 .time-main {
+                font-size: 22px;
+            }
+            .watermark-style-3 .timeline-time {
+                font-size: 28px;
+            }
+            .controls .style-btn {
+                font-size: 10px;
+                padding: 4px 10px;
+            }
+        }
+
+        /* 位置输入框 - 隐藏但可用 */
+        .hidden-location-input {
+            position: absolute;
+            opacity: 0;
+            width: 1px;
+            height: 1px;
+            pointer-events: none;
+        }
+
+        /* Toast提示 */
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: #fff;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 16px;
+            z-index: 999;
+            display: none;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .toast.show {
+            display: block;
+            animation: fadeInOut 2s ease;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+            15% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            85% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+        }
+
+        /* 视频录制指示器 */
+        .recording-indicator {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255,0,0,0.8);
+            color: #fff;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        .recording-indicator.active {
+            display: flex;
+        }
+
+        .recording-indicator .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #fff;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+    </style>
+</head>
+<body>
+    <div class="camera-container">
+        <!-- 预览区域 -->
+        <div class="preview-area" id="previewArea">
+            <div class="camera-preview" id="cameraPreview">
+                <!-- 水印将动态渲染到这里 -->
+                <div class="watermark-overlay" id="watermarkContainer"></div>
+            </div>
+
+            <!-- 录制指示器 -->
+            <div class="recording-indicator" id="recordingIndicator">
+                <span class="dot"></span>
+                录制中
+            </div>
+
+            <!-- 位置联想下拉框 -->
+            <div class="location-autocomplete" id="locationAutocomplete"></div>
+        </div>
+
+        <!-- 控制栏 -->
+        <div class="controls">
+            <div class="style-selector">
+                <button class="style-btn active" data-style="1">经典</button>
+                <button class="style-btn" data-style="2">简洁</button>
+                <button class="style-btn" data-style="3">时间线</button>
+            </div>
+            <div class="action-buttons">
+                <button class="mode-toggle" id="modeToggle">📷 拍照</button>
+                <button class="capture-btn" id="captureBtn">📸</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ============================================================
+        // 1. 数据模型
+        // ============================================================
+        const watermarkData = {
+            slogan: '醉酒当称人生几何',
+            date: '2026-08-08',
+            time: '19:34',
+            weekday: '星期六',
+            weather: '晴',
+            temp: '30°C',
+            location: '张家港市·妙中小区',
+            brand: '今日水印'
+        };
+
+        // 模拟位置数据库（实际项目中使用高德/腾讯API）
+        const mockLocations = [
+            { name: '妙中小区', address: '张家港市·杨舍镇' },
+            { name: '黄龙溪派出所', address: '成都市双流区·黄龙溪镇' },
+            { name: '天府广场', address: '成都市青羊区·人民南路' },
+            { name: '春熙路', address: '成都市锦江区·春熙路街道' },
+            { name: '宽窄巷子', address: '成都市青羊区·少城街道' },
+            { name: '锦里', address: '成都市武侯区·武侯祠大街' },
+            { name: '人民公园', address: '成都市青羊区·祠堂街' },
+            { name: '九眼桥', address: '成都市锦江区·九眼桥' },
+            { name: '太古里', address: '成都市锦江区·中纱帽街' },
+            { name: '环球中心', address: '成都市高新区·天府大道' },
+            { name: '张家港市', address: '江苏省苏州市' },
+            { name: '张家港站', address: '张家港市·塘桥镇' },
+            { name: '双流国际机场', address: '成都市双流区·机场路' },
+        ];
+
+        // ============================================================
+        // 2. 状态管理
+        // ============================================================
+        let currentStyle = 1;
+        let isVideoMode = false;
+        let isRecording = false;
+        let recordingTimer = null;
+        let recordingSeconds = 0;
+        let currentLocation = watermarkData.location;
+        let locationSuggestions = [];
+
+        // ============================================================
+        // 3. 水印渲染引擎
+        // ============================================================
+        function renderWatermark(style = currentStyle) {
+            const container = document.getElementById('watermarkContainer');
+            const data = {
+                ...watermarkData,
+                location: currentLocation
+            };
+
+            // 更新日期时间（模拟实时）
+            const now = new Date();
+            const weekdays = ['日','一','二','三','四','五','六'];
+            data.date = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+            data.time = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+            data.weekday = `星期${weekdays[now.getDay()]}`;
+
+            let html = '';
+
+            switch(style) {
+                case 1: // 经典版
+                    html = `
+                        <div class="watermark-style-1">
+                            <div class="slogan">${data.slogan}</div>
+                            <div class="datetime">${data.date} ${data.time}</div>
+                            <div class="weather">${data.weekday} ${data.weather} ${data.temp}</div>
+                            <div class="location" onclick="triggerLocationEdit()">
+                                <span>📍 ${data.location}</span>
+                                <span class="edit-icon">✎</span>
+                            </div>
+                        </div>
+                        <div class="brand-watermark">
+                            ${data.brand}<br>
+                            <span class="sub">真实可拍</span>
+                        </div>
+                    `;
+                    break;
+
+                case 2: // 简洁版
+                    html = `
+                        <div class="watermark-style-2">
+                            <div class="top-row">
+                                <span class="date-main">${data.date}</span>
+                                <span class="time-main">${data.time}</span>
+                            </div>
+                            <div class="info-row">
+                                <span>${data.weekday} ${data.weather} ${data.temp}</span>
+                                <span class="location-main" onclick="triggerLocationEdit()">
+                                    📍 ${data.location}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="brand-watermark">
+                            ${data.brand}
+                        </div>
+                    `;
+                    break;
+
+                case 3: // 时间线版
+                    html = `
+                        <div class="watermark-style-3">
+                            <div class="timeline-date">${data.date} ${data.weekday}</div>
+                            <div class="timeline-main">
+                                <span class="timeline-time">${data.time}</span>
+                                <span class="timeline-weather">${data.weather} ${data.temp}</span>
+                            </div>
+                            <div class="timeline-location" onclick="triggerLocationEdit()">
+                                📍 ${data.location}
+                            </div>
+                        </div>
+                        <div class="brand-watermark">
+                            ${data.brand}
+                        </div>
+                    `;
+                    break;
+            }
+
+            container.innerHTML = html;
+        }
+
+        // ============================================================
+        // 4. 位置自动联想功能
+        // ============================================================
+        function triggerLocationEdit() {
+            // 创建临时输入框触发联想
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'hidden-location-input';
+            input.value = currentLocation;
+            document.body.appendChild(input);
+            input.focus();
+            
+            // 监听输入事件
+            input.addEventListener('input', function(e) {
+                const value = this.value;
+                if (value.length >= 2) {
+                    showSuggestions(value);
+                } else {
+                    hideSuggestions();
+                }
+            });
+
+            // 失焦时保存
+            input.addEventListener('blur', function() {
+                setTimeout(() => {
+                    if (this.value.trim()) {
+                        currentLocation = this.value.trim();
+                        renderWatermark();
+                    }
+                    hideSuggestions();
+                    this.remove();
+                }, 300);
+            });
+
+            // 回车确认
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    const value = this.value.trim();
+                    if (value) {
+                        currentLocation = value;
+                        renderWatermark();
+                        hideSuggestions();
+                        this.blur();
+                    }
+                }
+            });
+
+            // 自动聚焦并选中内容
+            setTimeout(() => {
+                input.select();
+            }, 100);
+        }
+
+        function showSuggestions(query) {
+            const container = document.getElementById('locationAutocomplete');
+            
+            // 模糊匹配
+            const results = mockLocations.filter(item => 
+                item.name.includes(query) || 
+                item.address.includes(query)
+            );
+
+            if (results.length === 0) {
+                // 没有匹配时，允许用户输入自定义地点
+                container.innerHTML = `
+                    <div class="suggestion-item" onclick="selectLocation('${query}')">
+                        <div class="name">📌 使用 "${query}"</div>
+                        <div class="address">自定义位置</div>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = results.map(item => `
+                    <div class="suggestion-item" onclick="selectLocation('${item.name} · ${item.address.split('·').pop()}')">
+                        <div class="name">📍 ${item.name}</div>
+                        <div class="address">${item.address}</div>
+                    </div>
+                `).join('');
+            }
+
+            container.classList.add('active');
+        }
+
+        function hideSuggestions() {
+            document.getElementById('locationAutocomplete').classList.remove('active');
+        }
+
+        function selectLocation(location) {
+            currentLocation = location;
+            renderWatermark();
+            hideSuggestions();
+            showToast(`已更新位置: ${location}`);
+        }
+
+        // ============================================================
+        // 5. 拍摄/录像功能
+        // ============================================================
+        document.getElementById('captureBtn').addEventListener('click', function() {
+            if (isVideoMode) {
+                toggleRecording();
+            } else {
+                takePhoto();
+            }
+        });
+
+        function takePhoto() {
+            showToast('📸 拍照成功！已添加水印');
+            // 实际项目中使用相机API拍照并合成水印
+        }
+
+        function toggleRecording() {
+            const indicator = document.getElementById('recordingIndicator');
+            const btn = document.getElementById('captureBtn');
+            
+            if (!isRecording) {
+                // 开始录制
+                isRecording = true;
+                recordingSeconds = 0;
+                indicator.classList.add('active');
+                btn.textContent = '⏹';
+                btn.classList.add('video-mode');
+                showToast('🔴 开始录制视频...');
+                
+                recordingTimer = setInterval(() => {
+                    recordingSeconds++;
+                    // 更新水印时间（视频录制时时间戳动态变化）
+                    renderWatermark();
+                }, 1000);
+            } else {
+                // 停止录制
+                isRecording = false;
+                clearInterval(recordingTimer);
+                indicator.classList.remove('active');
+                btn.textContent = '🎥';
+                btn.classList.remove('video-mode');
+                showToast(`⏹ 视频录制结束 (${recordingSeconds}秒)`);
+                
+                // 视频水印处理（实际项目中使用FFmpeg）
+                console.log(`视频录制完成，时长: ${recordingSeconds}秒，已添加逐帧水印`);
+            }
+        }
+
+        // ============================================================
+        // 6. 模式切换
+        // ============================================================
+        document.getElementById('modeToggle').addEventListener('click', function() {
+            isVideoMode = !isVideoMode;
+            this.textContent = isVideoMode ? '🎥 录像' : '📷 拍照';
+            this.classList.toggle('active');
+            
+            const btn = document.getElementById('captureBtn');
+            if (isVideoMode) {
+                btn.textContent = '🎥';
+                btn.classList.remove('video-mode');
+            } else {
+                btn.textContent = '📸';
+                btn.classList.remove('video-mode');
+            }
+            
+            // 如果正在录制，停止
+            if (isRecording) {
+                toggleRecording();
+            }
+            
+            showToast(isVideoMode ? '切换到录像模式' : '切换到拍照模式');
+        });
+
+        // ============================================================
+        // 7. 样式切换
+        // ============================================================
+        document.querySelectorAll('.style-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.style-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentStyle = parseInt(this.dataset.style);
+                renderWatermark();
+                showToast(`切换到${this.textContent}样式`);
+            });
+        });
+
+        // ============================================================
+        // 8. Toast提示
+        // ============================================================
+        let toastTimeout = null;
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        // ============================================================
+        // 9. 初始化
+        // ============================================================
+        renderWatermark();
+
+        // 模拟实时时间更新（每分钟）
+        setInterval(() => {
+            renderWatermark();
+        }, 60000);
+
+        // 点击空白区域隐藏联想
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.location-autocomplete') && 
+                !e.target.closest('.location')) {
+                hideSuggestions();
+            }
+        });
+
+        console.log('✅ 今日水印相机已启动');
+        console.log('📌 功能: 3种水印样式 | 位置自动联想 | 视频水印支持');
+        console.log('💡 点击位置文字可编辑，输入2个字符以上触发联想');
+        console.log('🎥 切换录像模式后，点击红色按钮录制视频');
+    </script>
+</body>
+</html>
