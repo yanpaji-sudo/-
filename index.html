@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>今日水印相机 - 可拖动版</title>
+    <title>今日水印相机</title>
     <style>
         * {
             margin: 0;
@@ -124,7 +124,7 @@
         }
 
         /* ================================================================
-           ★★★ 可拖动水印系统 ★★★
+           水印图层
            ================================================================ */
         .watermark-layer {
             position: absolute;
@@ -137,13 +137,11 @@
             overflow: hidden;
         }
 
-        /* ---------- 可拖动元素基类 ---------- */
         .draggable-item {
             position: absolute;
             pointer-events: auto;
             cursor: grab;
             touch-action: none;
-            transition: box-shadow 0.2s;
             border-radius: 6px;
         }
         .draggable-item:active {
@@ -180,7 +178,9 @@
             display: block;
         }
 
-        /* ---------- 主水印卡片 ---------- */
+        /* ================================================================
+           主水印卡片
+           ================================================================ */
         .watermark-card {
             background: #ffffff;
             border-radius: 6px;
@@ -248,54 +248,78 @@
             margin-left: 2px;
         }
 
-        /* ---------- 防伪标签（独立可拖动） ---------- */
+        /* ================================================================
+           ★★★ 防伪标签 - 完全按截图还原 ★★★
+           ================================================================ */
         .anti-tag {
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border-radius: 6px;
-            padding: 6px 12px 6px 14px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+            padding: 8px 14px 8px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.4);
             width: 100%;
             height: 100%;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            min-width: 100px;
+            min-width: 120px;
+            min-height: 60px;
         }
 
-        .anti-tag .anti-row {
+        /* 第一行：今日水印（左） + 防伪码（右） */
+        .anti-row-1 {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: baseline;
             line-height: 1.4;
+            margin-bottom: 2px;
         }
 
-        .anti-tag .anti-brand {
+        /* ★★★ "今日水印" - "今"字的点是黄色 ★★★ */
+        .anti-brand {
+            font-family: 'STKaiti', 'KaiTi', '华文楷体', '楷体', 'SimSun', serif;
+            font-weight: 600;
+            font-size: 15px;
             color: #ffffff;
-            font-size: 11px;
-            font-weight: 500;
-            letter-spacing: 0.3px;
+            letter-spacing: 2px;
         }
 
-        .anti-tag .anti-sub {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 8px;
-            letter-spacing: 0.2px;
+        /* "今"字的点（丶）变成黄色 */
+        .anti-brand .highlight-dot {
+            color: #FFD700;
         }
 
-        .anti-tag .anti-code {
+        .anti-code {
+            font-family: 'Courier New', 'Consolas', 'Monaco', monospace;
+            font-weight: 400;
+            font-size: 9px;
             color: rgba(255, 255, 255, 0.3);
-            font-size: 8px;
-            font-family: 'Courier New', 'Monaco', monospace;
-            letter-spacing: 0.2px;
-            background: rgba(255, 255, 255, 0.05);
+            letter-spacing: 0.5px;
+            background: rgba(255, 255, 255, 0.04);
             padding: 1px 8px;
             border-radius: 3px;
         }
 
-        /* ---------- 样式切换（底部控制） ---------- */
+        /* 第二行：相机 真实可验 */
+        .anti-row-2 {
+            display: flex;
+            align-items: center;
+            line-height: 1.4;
+        }
+
+        .anti-sub {
+            font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+            font-weight: 300;
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 0.5px;
+        }
+
+        /* ================================================================
+           编辑区
+           ================================================================ */
         .edit-area {
             background: rgba(255, 255, 255, 0.03);
             border-radius: 10px;
@@ -524,7 +548,6 @@
             display: none;
         }
 
-        /* 控制提示 */
         .drag-hint {
             position: absolute;
             bottom: 8px;
@@ -584,7 +607,6 @@
             <div class="media-container" id="mediaContainer">
                 <img id="previewImage" style="display:none;width:100%;max-height:500px;object-fit:contain;background:#111;">
                 <video id="previewVideo" style="display:none;width:100%;max-height:500px;object-fit:contain;background:#111;" controls></video>
-                <!-- 水印图层 -->
                 <div class="watermark-layer" id="watermarkLayer"></div>
                 <div class="drag-hint" id="dragHint">↕ 拖拽移动 · 右下角缩放</div>
             </div>
@@ -673,7 +695,6 @@
             const mediaContainer = document.getElementById('mediaContainer');
             const placeholder = document.getElementById('placeholder');
             const watermarkLayer = document.getElementById('watermarkLayer');
-            const dragHint = document.getElementById('dragHint');
             const editDate = document.getElementById('editDate');
             const editTime = document.getElementById('editTime');
             const editWeather = document.getElementById('editWeather');
@@ -698,9 +719,8 @@
             let mediaUrl = null;
             let antiCode = generateAntiCode();
 
-            // 可拖动元素状态
             let mainCardState = { x: 30, y: 50, w: 240, h: 100 };
-            let antiTagState = { x: 200, y: 180, w: 160, h: 50 };
+            let antiTagState = { x: 160, y: 180, w: 180, h: 55 };
 
             // ============================================================
             // 防伪码
@@ -810,89 +830,24 @@
             }
 
             // ============================================================
-            // ★★★ 渲染水印（可拖动） ★★★
+            // ★★★ 构建防伪标签HTML - "今"字点是黄色 ★★★
             // ============================================================
-            function renderWatermarks() {
-                const layer = watermarkLayer;
-                const container = mediaContainer;
-                const rect = container.getBoundingClientRect();
-                const scale = rect.width / 420 || 1;
-
-                const date = editDate.value || '2026-08-08';
-                const time = editTime.value || '15:12';
-                const weather = editWeather.value || '晴';
-                const temp = editTemp.value || '35';
-                const location = editLocation.value || '成都市双流区·芝麻公园';
-                const title = editTitle.value || '工程记录';
-
-                const dateParts = date.split('-');
-                const formattedDate = dateParts[0] + '.' + dateParts[1] + '.' + dateParts[2];
-
-                if (showAntiTag.checked) {
-                    antiCode = generateAntiCode();
-                }
-
-                // ---- 构建主水印HTML ----
-                const mainHTML = buildMainCardHTML(title, formattedDate, time, weather, temp, location);
-
-                // ---- 构建防伪标签HTML ----
-                const antiHTML = buildAntiTagHTML(antiCode);
-
-                // ---- 组装 ----
-                const showMain = showMainCard.checked;
-                const showAnti = showAntiTag.checked;
-
-                // 应用缩放
-                const ms = mainCardState;
-                const as = antiTagState;
-
-                let html = '';
-
-                if (showMain) {
-                    html += `
-                        <div class="draggable-item" id="mainCard" 
-                             style="left:${ms.x * scale}px; top:${ms.y * scale}px; width:${ms.w * scale}px; height:${ms.h * scale}px;"
-                             data-x="${ms.x}" data-y="${ms.y}" data-w="${ms.w}" data-h="${ms.h}">
-                            <div class="drag-border"></div>
-                            ${mainHTML}
-                            <div class="resize-handle" id="mainResize"></div>
+            function buildAntiTagHTML(code) {
+                return `
+                    <div class="anti-tag">
+                        <div class="anti-row-1">
+                            <span class="anti-brand">今<span class="highlight-dot">丶</span>日水印</span>
+                            <span class="anti-code">${code}</span>
                         </div>
-                    `;
-                }
-
-                if (showAnti) {
-                    html += `
-                        <div class="draggable-item" id="antiTag" 
-                             style="left:${as.x * scale}px; top:${as.y * scale}px; width:${as.w * scale}px; height:${as.h * scale}px;"
-                             data-x="${as.x}" data-y="${as.y}" data-w="${as.w}" data-h="${as.h}">
-                            <div class="drag-border"></div>
-                            ${antiHTML}
-                            <div class="resize-handle" id="antiResize"></div>
+                        <div class="anti-row-2">
+                            <span class="anti-sub">相机 真实可验</span>
                         </div>
-                    `;
-                }
-
-                layer.innerHTML = html;
-
-                // 重新绑定拖动事件
-                setTimeout(() => {
-                    initDraggable('mainCard', 'mainResize', (x, y, w, h) => {
-                        mainCardState.x = x;
-                        mainCardState.y = y;
-                        mainCardState.w = w;
-                        mainCardState.h = h;
-                    });
-                    initDraggable('antiTag', 'antiResize', (x, y, w, h) => {
-                        antiTagState.x = x;
-                        antiTagState.y = y;
-                        antiTagState.w = w;
-                        antiTagState.h = h;
-                    });
-                }, 50);
+                    </div>
+                `;
             }
 
             // ============================================================
-            // 构建主水印HTML
+            // ★★★ 构建主水印HTML ★★★
             // ============================================================
             function buildMainCardHTML(title, date, time, weather, temp, location) {
                 if (currentStyle === 'white') {
@@ -921,7 +876,6 @@
                         </div>
                     `;
                 } else {
-                    // simple
                     return `
                         <div class="watermark-card" style="background:rgba(0,0,0,0.3);backdrop-filter:blur(4px);border:none;box-shadow:0 2px 12px rgba(0,0,0,0.3);">
                             <div class="wm-body" style="background:transparent;padding:10px 14px 8px 14px;">
@@ -938,24 +892,80 @@
             }
 
             // ============================================================
-            // 构建防伪标签HTML
+            // ★★★ 渲染水印 ★★★
             // ============================================================
-            function buildAntiTagHTML(code) {
-                return `
-                    <div class="anti-tag">
-                        <div class="anti-row">
-                            <span class="anti-brand">今日水印</span>
-                            <span class="anti-code">${code}</span>
+            function renderWatermarks() {
+                const layer = watermarkLayer;
+                const container = mediaContainer;
+                const rect = container.getBoundingClientRect();
+                const scale = rect.width / 420 || 1;
+
+                const date = editDate.value || '2026-08-08';
+                const time = editTime.value || '15:12';
+                const weather = editWeather.value || '晴';
+                const temp = editTemp.value || '35';
+                const location = editLocation.value || '成都市双流区·芝麻公园';
+                const title = editTitle.value || '工程记录';
+
+                const dateParts = date.split('-');
+                const formattedDate = dateParts[0] + '.' + dateParts[1] + '.' + dateParts[2];
+
+                if (showAntiTag.checked) {
+                    antiCode = generateAntiCode();
+                }
+
+                const showMain = showMainCard.checked;
+                const showAnti = showAntiTag.checked;
+
+                const ms = mainCardState;
+                const as = antiTagState;
+
+                let html = '';
+
+                if (showMain) {
+                    html += `
+                        <div class="draggable-item" id="mainCard" 
+                             style="left:${ms.x * scale}px; top:${ms.y * scale}px; width:${ms.w * scale}px; height:${ms.h * scale}px;"
+                             data-x="${ms.x}" data-y="${ms.y}" data-w="${ms.w}" data-h="${ms.h}">
+                            <div class="drag-border"></div>
+                            ${buildMainCardHTML(title, formattedDate, time, weather, temp, location)}
+                            <div class="resize-handle" id="mainResize"></div>
                         </div>
-                        <div class="anti-row">
-                            <span class="anti-sub">相机真实可验</span>
+                    `;
+                }
+
+                if (showAnti) {
+                    html += `
+                        <div class="draggable-item" id="antiTag" 
+                             style="left:${as.x * scale}px; top:${as.y * scale}px; width:${as.w * scale}px; height:${as.h * scale}px;"
+                             data-x="${as.x}" data-y="${as.y}" data-w="${as.w}" data-h="${as.h}">
+                            <div class="drag-border"></div>
+                            ${buildAntiTagHTML(antiCode)}
+                            <div class="resize-handle" id="antiResize"></div>
                         </div>
-                    </div>
-                `;
+                    `;
+                }
+
+                layer.innerHTML = html;
+
+                setTimeout(() => {
+                    initDraggable('mainCard', 'mainResize', (x, y, w, h) => {
+                        mainCardState.x = x;
+                        mainCardState.y = y;
+                        mainCardState.w = w;
+                        mainCardState.h = h;
+                    });
+                    initDraggable('antiTag', 'antiResize', (x, y, w, h) => {
+                        antiTagState.x = x;
+                        antiTagState.y = y;
+                        antiTagState.w = w;
+                        antiTagState.h = h;
+                    });
+                }, 50);
             }
 
             // ============================================================
-            // ★★★ 拖动+缩放系统 ★★★
+            // 拖动系统
             // ============================================================
             function initDraggable(elementId, resizeHandleId, onUpdate) {
                 const el = document.getElementById(elementId);
@@ -966,7 +976,6 @@
                 let isResizing = false;
                 let startX, startY, startW, startH, startMX, startMY;
 
-                // 拖动
                 el.addEventListener('mousedown', function(e) {
                     if (e.target.closest('.resize-handle')) return;
                     isDragging = true;
@@ -974,15 +983,12 @@
                     startX = e.clientX;
                     startY = e.clientY;
                     const scale = rect.width / 420 || 1;
-                    const x = parseFloat(el.dataset.x) || 0;
-                    const y = parseFloat(el.dataset.y) || 0;
-                    startMX = x;
-                    startMY = y;
+                    startMX = parseFloat(el.dataset.x) || 0;
+                    startMY = parseFloat(el.dataset.y) || 0;
                     el.style.cursor = 'grabbing';
                     e.preventDefault();
                 });
 
-                // 缩放
                 const resizeHandle = document.getElementById(resizeHandleId);
                 if (resizeHandle) {
                     resizeHandle.addEventListener('mousedown', function(e) {
@@ -999,7 +1005,6 @@
                     });
                 }
 
-                // 移动/缩放
                 document.addEventListener('mousemove', function(e) {
                     const rect = container.getBoundingClientRect();
                     const scale = rect.width / 420 || 1;
@@ -1056,7 +1061,6 @@
                         touchStartMY = parseFloat(el.dataset.y) || 0;
                         e.preventDefault();
                     } else if (touches.length === 2) {
-                        // 双指缩放
                         isResizing = true;
                         const rect = container.getBoundingClientRect();
                         const scale = rect.width / 420 || 1;
@@ -1202,25 +1206,21 @@
 
                 const scale = Math.min(w, h) / 800;
 
-                // 主水印
                 if (showMain) {
                     const ms = mainCardState;
                     const cx = ms.x * (w / 420);
                     const cy = ms.y * (h / 700);
                     const cw = ms.w * (w / 420);
                     const ch = ms.h * (h / 700);
-
                     drawMainCard(ctx, cx, cy, cw, ch, title, formattedDate, time, weather, temp, location, scale);
                 }
 
-                // 防伪标签
                 if (showAnti) {
                     const as = antiTagState;
                     const ax = as.x * (w / 420);
                     const ay = as.y * (h / 700);
                     const aw = as.w * (w / 420);
                     const ah = as.h * (h / 700);
-
                     drawAntiTag(ctx, ax, ay, aw, ah, code, scale);
                 }
             }
@@ -1229,7 +1229,6 @@
                 const r = 6 * scale;
                 const pad = 10 * scale;
 
-                // 白底
                 ctx.shadowColor = 'rgba(0,0,0,0.5)';
                 ctx.shadowBlur = 16 * scale;
                 ctx.fillStyle = '#ffffff';
@@ -1239,8 +1238,6 @@
                 ctx.shadowBlur = 0;
 
                 let cy = y;
-
-                // 蓝条
                 const barH = 24 * scale;
                 const grad = ctx.createLinearGradient(x, cy, x, cy + barH);
                 grad.addColorStop(0, '#1a6bc4');
@@ -1262,8 +1259,6 @@
                 ctx.fillText('水印', x + w - pad, cy + barH / 2);
 
                 cy += barH + 4 * scale;
-
-                // 内容
                 const lineH = 18 * scale;
                 const labelX = x + pad;
                 const valX = x + pad + 50 * scale;
@@ -1296,10 +1291,9 @@
             function drawAntiTag(ctx, x, y, w, h, code, scale) {
                 const pad = 10 * scale;
 
-                // 背景
                 ctx.shadowColor = 'rgba(0,0,0,0.4)';
                 ctx.shadowBlur = 12 * scale;
-                ctx.fillStyle = 'rgba(0,0,0,0.65)';
+                ctx.fillStyle = 'rgba(0,0,0,0.55)';
                 ctx.beginPath();
                 ctx.roundRect(x, y, w, h, 6 * scale);
                 ctx.fill();
@@ -1313,26 +1307,34 @@
 
                 const cy = y + h / 2;
 
-                // 第一行：今日水印 + 防伪码
+                // "今日水印" - "今"字的点是黄色
                 ctx.fillStyle = '#ffffff';
-                ctx.font = '500 ' + (10 * scale) + 'px -apple-system, sans-serif';
+                ctx.font = '600 ' + (13 * scale) + 'px "STKaiti","KaiTi",serif';
                 ctx.textAlign = 'left';
                 ctx.textBaseline = 'middle';
-                ctx.fillText('今日水印', x + pad, cy - 6 * scale);
 
-                ctx.fillStyle = 'rgba(255,255,255,0.25)';
+                // 画"今"
+                ctx.fillText('今', x + pad, cy - 5 * scale);
+                // "今"字的点是黄色
+                ctx.fillStyle = '#FFD700';
+                ctx.fillText('丶', x + pad + 11 * scale, cy - 8 * scale);
+                // 继续画"日水印"
+                ctx.fillStyle = '#ffffff';
+                ctx.fillText('日水印', x + pad + 18 * scale, cy - 5 * scale);
+
+                // 防伪码 - 右上
+                ctx.fillStyle = 'rgba(255,255,255,0.3)';
                 ctx.font = (7 * scale) + 'px monospace';
                 ctx.textAlign = 'right';
-                ctx.fillText(code, x + w - pad, cy - 6 * scale);
+                ctx.fillText(code, x + w - pad, cy - 5 * scale);
 
-                // 第二行：相机真实可验
+                // 相机 真实可验 - 左下
                 ctx.fillStyle = 'rgba(255,255,255,0.4)';
-                ctx.font = (7 * scale) + 'px -apple-system, sans-serif';
+                ctx.font = '300 ' + (7.5 * scale) + 'px -apple-system, sans-serif';
                 ctx.textAlign = 'left';
-                ctx.fillText('相机真实可验', x + pad, cy + 8 * scale);
+                ctx.fillText('相机 真实可验', x + pad, cy + 8 * scale);
             }
 
-            // roundRect polyfill
             if (!CanvasRenderingContext2D.prototype.roundRect) {
                 CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
                     if (r > w / 2) r = w / 2;
@@ -1461,8 +1463,9 @@
             // ============================================================
             renderWatermarks();
 
-            console.log('📷 今日水印相机 - 可拖动版');
-            console.log('💡 拖拽移动 · 右下角缩放 · 双指缩放');
+            console.log('📷 今日水印相机 - 最终还原版');
+            console.log('✅ "今"字的点是黄色');
+            console.log('✅ 格式：今日水印 / 相机 真实可验 / 防伪 DKCE...');
 
         })();
     </script>
