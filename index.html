@@ -1,3 +1,5 @@
+
+               
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -852,4 +854,112 @@
                 ctx.fillStyle = 'rgba(255,255,255,0.18)';
                 ctx.font = `${smallFont * 0.8}px sans-serif`;
                 ctx.fillText('真实可拍', w - padding, h - padding - smallFont * 0.9);
-               
+                ctx.textBaseline = 'alphabetic';
+            }
+
+            // 重置阴影
+            ctx.textShadowColor = 'transparent';
+        }
+
+        // ============================================================
+        // 导出视频（使用Canvas逐帧处理）
+        // ============================================================
+        async function exportVideo(btn, fill) {
+            const video = document.getElementById('previewVideo');
+            if (!video.src) { throw new Error('没有视频'); }
+
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            // 创建视频元素用于解码
+            const v = document.createElement('video');
+            v.src = video.src;
+            await v.play();
+
+            canvas.width = v.videoWidth || 1280;
+            canvas.height = v.videoHeight || 720;
+
+            const duration = v.duration;
+            const fps = 30;
+            const totalFrames = Math.floor(duration * fps);
+
+            // 使用MediaRecorder录制
+            const stream = canvas.captureStream(fps);
+            const recorder = new MediaRecorder(stream, {
+                mimeType: 'video/webm;codecs=vp9',
+                videoBitsPerSecond: 5000000
+            });
+
+            const chunks = [];
+            recorder.ondataavailable = e => chunks.push(e.data);
+            recorder.start();
+
+            let frame = 0;
+            while (frame < totalFrames) {
+                const time = frame / fps;
+                v.currentTime = Math.min(time, duration - 0.01);
+                await new Promise(r => setTimeout(r, 50));
+
+                // 等待视频帧就绪
+                await new Promise(r => {
+                    const check = () => {
+                        if (v.readyState >= 2) { r(); }
+                        else { setTimeout(check, 50); }
+                    };
+                    check();
+                });
+
+                // 绘制视频帧
+                ctx.drawImage(v, 0, 0, canvas.width, canvas.height);
+                // 绘制水印
+                drawWatermarkOnCanvas(ctx, canvas.width, canvas.height);
+
+                frame++;
+                fill.style.width = `${(frame / totalFrames) * 100}%`;
+                btn.textContent = `⏳ 处理中 ${Math.round((frame / totalFrames) * 100)}%`;
+            }
+
+            // 停止录制
+            recorder.stop();
+            await new Promise(r => recorder.onstop = r);
+
+            // 导出
+            const blob = new Blob(chunks, { type: 'video/webm' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.download = `水印_${Date.now()}.webm`;
+            link.href = url;
+            link.click();
+
+            showToast('✅ 视频导出成功！');
+        }
+
+        // ============================================================
+        // Toast
+        // ============================================================
+        let toastTimer = null;
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+        }
+
+        // ============================================================
+        // 快捷操作：回车触发联想选择
+        // ============================================================
+        document.getElementById('editLocation').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const suggestions = document.getElementById('suggestions');
+                const first = suggestions.querySelector('.item');
+                if (first) first.click();
+                suggestions.classList.remove('active');
+            }
+        });
+
+        console.log('📷 今日水印工具已加载');
+        console.log('💡 选择照片或视频，添加水印后导出');
+    </script>
+</body>
+</html>
