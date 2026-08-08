@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>今日水印相机</title>
+    <title>今日水印 - 多模板版</title>
     <style>
         * {
             margin: 0;
@@ -124,7 +124,7 @@
         }
 
         /* ================================================================
-           水印图层
+           水印图层 - 可拖动
            ================================================================ */
         .watermark-layer {
             position: absolute;
@@ -179,9 +179,9 @@
         }
 
         /* ================================================================
-           主水印卡片
+           模板1：工程记录
            ================================================================ */
-        .watermark-card {
+        .template-engineering {
             background: #ffffff;
             border-radius: 6px;
             overflow: hidden;
@@ -189,74 +189,56 @@
             width: 100%;
             height: 100%;
             font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif;
+            min-width: 160px;
         }
-
-        .wm-header {
+        .template-engineering .header {
             background: linear-gradient(135deg, #1a6bc4, #2a7ee8);
-            padding: 5px 14px;
+            padding: 4px 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            min-height: 28px;
+            min-height: 24px;
         }
-        .wm-header .wm-title {
-            color: #ffffff;
-            font-size: 13px;
+        .template-engineering .header .title {
+            color: #fff;
+            font-size: 12px;
             font-weight: 500;
-            letter-spacing: 0.3px;
         }
-        .wm-header .wm-badge {
-            color: rgba(255, 255, 255, 0.65);
-            font-size: 9px;
-            background: rgba(255, 255, 255, 0.12);
-            padding: 1px 12px;
-            border-radius: 10px;
-            letter-spacing: 0.3px;
+        .template-engineering .header .badge {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0 10px;
+            border-radius: 8px;
         }
-
-        .wm-body {
-            padding: 8px 14px 6px 14px;
+        .template-engineering .body {
+            padding: 6px 12px 8px 12px;
             background: #ffffff;
         }
-
-        .wm-line {
-            font-size: 12px;
-            line-height: 1.7;
+        .template-engineering .body .row {
+            font-size: 10px;
+            line-height: 1.6;
             color: #1a1a1a;
-            letter-spacing: 0.2px;
-            font-weight: 400;
             white-space: nowrap;
         }
-        .wm-line .wm-label {
-            color: #555555;
-            font-weight: 400;
+        .template-engineering .body .row .lbl {
+            color: #888;
         }
-        .wm-line .wm-value {
+        .template-engineering .body .row .val {
             color: #1a1a1a;
-            font-weight: 400;
         }
-        .wm-high-temp {
+        .template-engineering .body .row .highlight {
             color: #e53935;
-            font-weight: 500;
-        }
-        .wm-location-text {
-            color: #1a1a1a;
-        }
-        .wm-location-text .wm-arrow {
-            color: #bbbbbb;
-            font-size: 10px;
-            margin-left: 2px;
         }
 
         /* ================================================================
-           ★★★ 防伪标签 - 完全按截图还原 ★★★
+           模板2：经纬度水印
            ================================================================ */
-        .anti-tag {
-            background: rgba(0, 0, 0, 0.55);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+        .template-gps {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
             border-radius: 6px;
-            padding: 8px 14px 8px 14px;
+            padding: 8px 14px;
             border: 1px solid rgba(255, 255, 255, 0.06);
             box-shadow: 0 2px 16px rgba(0, 0, 0, 0.4);
             width: 100%;
@@ -264,57 +246,181 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-            min-width: 120px;
+            min-width: 140px;
             min-height: 60px;
         }
-
-        /* 第一行：今日水印（左） + 防伪码（右） */
-        .anti-row-1 {
+        .template-gps .main-row {
             display: flex;
             justify-content: space-between;
             align-items: baseline;
-            line-height: 1.4;
-            margin-bottom: 2px;
         }
-
-        /* ★★★ "今日水印" - "今"字的点是黄色 ★★★ */
-        .anti-brand {
-            font-family: 'STKaiti', 'KaiTi', '华文楷体', '楷体', 'SimSun', serif;
-            font-weight: 600;
-            font-size: 15px;
-            color: #ffffff;
-            letter-spacing: 2px;
+        .template-gps .main-row .big {
+            font-size: 18px;
+            font-weight: 200;
+            color: #fff;
+            letter-spacing: 1px;
         }
-
-        /* "今"字的点（丶）变成黄色 */
-        .anti-brand .highlight-dot {
-            color: #FFD700;
+        .template-gps .main-row .date {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.5);
         }
-
-        .anti-code {
-            font-family: 'Courier New', 'Consolas', 'Monaco', monospace;
-            font-weight: 400;
-            font-size: 9px;
-            color: rgba(255, 255, 255, 0.3);
-            letter-spacing: 0.5px;
-            background: rgba(255, 255, 255, 0.04);
-            padding: 1px 8px;
-            border-radius: 3px;
-        }
-
-        /* 第二行：相机 真实可验 */
-        .anti-row-2 {
-            display: flex;
-            align-items: center;
-            line-height: 1.4;
-        }
-
-        .anti-sub {
-            font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
-            font-weight: 300;
+        .template-gps .sub-row {
             font-size: 9px;
             color: rgba(255, 255, 255, 0.4);
-            letter-spacing: 0.5px;
+            line-height: 1.5;
+            margin-top: 2px;
+        }
+        .template-gps .sub-row .lbl {
+            color: rgba(255, 255, 255, 0.25);
+        }
+
+        /* ================================================================
+           模板3：天气水印
+           ================================================================ */
+        .template-weather {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            border-radius: 6px;
+            padding: 8px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.4);
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 140px;
+            min-height: 60px;
+        }
+        .template-weather .top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .template-weather .top .left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .template-weather .top .left .icon {
+            font-size: 24px;
+        }
+        .template-weather .top .left .temp {
+            font-size: 18px;
+            font-weight: 300;
+            color: #fff;
+        }
+        .template-weather .top .left .desc {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        .template-weather .top .time {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+        .template-weather .bottom {
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 2px;
+        }
+
+        /* ================================================================
+           模板4：打卡水印
+           ================================================================ */
+        .template-checkin {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            border-radius: 6px;
+            padding: 8px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.4);
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 140px;
+            min-height: 60px;
+        }
+        .template-checkin .time-big {
+            font-size: 28px;
+            font-weight: 200;
+            color: #fff;
+            letter-spacing: 2px;
+        }
+        .template-checkin .info-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 2px;
+        }
+
+        /* ================================================================
+           模板5：治安巡逻
+           ================================================================ */
+        .template-patrol {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            border-radius: 6px;
+            padding: 8px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.4);
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 140px;
+            min-height: 60px;
+        }
+        .template-patrol .title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #FFD700;
+            letter-spacing: 4px;
+        }
+        .template-patrol .info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 2px;
+        }
+
+        /* ================================================================
+           模板选择器
+           ================================================================ */
+        .template-selector {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+        .template-btn {
+            padding: 8px 2px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.03);
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 9px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            line-height: 1.3;
+        }
+        .template-btn.active {
+            background: #2a7ee8;
+            border-color: #2a7ee8;
+            color: #fff;
+        }
+        .template-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .template-btn .icon {
+            font-size: 16px;
+            display: block;
+            margin-bottom: 2px;
         }
 
         /* ================================================================
@@ -368,12 +474,6 @@
             color: rgba(255, 255, 255, 0.2);
             font-size: 12px;
         }
-        .edit-row .temp-group {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            flex: 1;
-        }
 
         .suggestions {
             background: #222;
@@ -402,56 +502,17 @@
             color: rgba(255, 255, 255, 0.25);
         }
 
-        .style-selector {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 14px;
-        }
-        .style-btn {
-            flex: 1;
-            padding: 8px 0;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 6px;
-            background: transparent;
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
+        .weather-status {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.2);
+            padding: 4px 0;
             text-align: center;
         }
-        .style-btn.active {
-            background: #2a7ee8;
-            border-color: #2a7ee8;
-            color: #fff;
+        .weather-status .ok {
+            color: #4CAF50;
         }
-        .style-btn:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .anti-switch {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 8px 14px;
-            background: rgba(255, 215, 0, 0.04);
-            border-radius: 8px;
-            border: 1px solid rgba(255, 215, 0, 0.06);
-            margin-bottom: 14px;
-            flex-wrap: wrap;
-        }
-        .anti-switch label {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.5);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-        }
-        .anti-switch input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
-            accent-color: #2a7ee8;
-            cursor: pointer;
+        .weather-status .loading {
+            color: #FFD700;
         }
 
         .export-btn {
@@ -568,11 +629,11 @@
         }
 
         @media (max-width: 400px) {
-            .wm-line {
-                font-size: 10px;
+            .template-btn {
+                font-size: 7px;
             }
-            .wm-header .wm-title {
-                font-size: 11px;
+            .template-btn .icon {
+                font-size: 14px;
             }
         }
     </style>
@@ -582,7 +643,7 @@
 
         <div class="app-title">
             📷 今日水印相机
-            <span>拖拽 · 缩放 · 自由布局</span>
+            <span>5种模板 · 自由拖动 · 自动天气</span>
         </div>
 
         <div class="upload-area">
@@ -612,60 +673,39 @@
             </div>
         </div>
 
-        <div class="style-selector">
-            <button class="style-btn active" data-style="white">白底蓝条</button>
-            <button class="style-btn" data-style="dark">黑底透明</button>
-            <button class="style-btn" data-style="simple">简洁白字</button>
+        <!-- 模板选择 -->
+        <div class="template-selector" id="templateSelector">
+            <button class="template-btn active" data-template="engineering">
+                <span class="icon">🏗️</span>工程记录
+            </button>
+            <button class="template-btn" data-template="gps">
+                <span class="icon">📍</span>经纬度
+            </button>
+            <button class="template-btn" data-template="weather">
+                <span class="icon">🌤️</span>天气
+            </button>
+            <button class="template-btn" data-template="checkin">
+                <span class="icon">📌</span>打卡
+            </button>
+            <button class="template-btn" data-template="patrol">
+                <span class="icon">🚔</span>治安巡逻
+            </button>
         </div>
 
+        <!-- 天气状态 -->
+        <div class="weather-status" id="weatherStatus">🌐 正在获取天气...</div>
+
+        <!-- 编辑 -->
         <div class="edit-area">
             <div class="edit-row">
-                <label>📅 日期</label>
-                <input type="date" id="editDate">
-            </div>
-            <div class="edit-row">
-                <label>⏰ 时间</label>
-                <input type="time" id="editTime">
-            </div>
-            <div class="edit-row">
-                <label>🌤️ 天气</label>
-                <select id="editWeather" style="flex:0.8;">
-                    <option value="晴">晴</option>
-                    <option value="多云">多云</option>
-                    <option value="阴">阴</option>
-                    <option value="小雨">小雨</option>
-                    <option value="大雨">大雨</option>
-                    <option value="雪">雪</option>
-                    <option value="雾">雾</option>
-                </select>
-                <div class="temp-group">
-                    <input type="number" id="editTemp" value="35" min="-20" max="50" style="max-width:50px;">
-                    <span class="unit">°C</span>
-                </div>
-            </div>
-            <div class="edit-row" style="position:relative;flex-wrap:wrap;">
                 <label>📍 地点</label>
-                <input type="text" id="editLocation" placeholder="输入地点" value="成都市双流区·芝麻公园" style="flex:2;min-width:120px;">
+                <input type="text" id="editLocation" placeholder="输入地点" value="北京国贸" style="flex:2;min-width:120px;">
             </div>
             <div class="suggestions" id="suggestions"></div>
             <div class="edit-row" style="margin-bottom:0;">
                 <label>📝 标题</label>
                 <input type="text" id="editTitle" value="工程记录" style="flex:1;">
             </div>
-        </div>
-
-        <div class="anti-switch">
-            <label>
-                <input type="checkbox" id="showAntiTag" checked>
-                🏷️ 显示防伪标签
-            </label>
-            <label>
-                <input type="checkbox" id="showMainCard" checked>
-                📋 显示主水印
-            </label>
-            <label style="margin-left:auto;color:rgba(255,255,255,0.15);font-size:10px;">
-                拖拽·缩放
-            </label>
         </div>
 
         <div class="progress-bar" id="progressBar">
@@ -695,50 +735,52 @@
             const mediaContainer = document.getElementById('mediaContainer');
             const placeholder = document.getElementById('placeholder');
             const watermarkLayer = document.getElementById('watermarkLayer');
-            const editDate = document.getElementById('editDate');
-            const editTime = document.getElementById('editTime');
-            const editWeather = document.getElementById('editWeather');
-            const editTemp = document.getElementById('editTemp');
             const editLocation = document.getElementById('editLocation');
             const editTitle = document.getElementById('editTitle');
             const suggestions = document.getElementById('suggestions');
-            const showAntiTag = document.getElementById('showAntiTag');
-            const showMainCard = document.getElementById('showMainCard');
             const exportBtn = document.getElementById('exportBtn');
             const progressBar = document.getElementById('progressBar');
             const progressFill = document.getElementById('progressFill');
             const fileInfo = document.getElementById('fileInfo');
             const toast = document.getElementById('toast');
+            const weatherStatus = document.getElementById('weatherStatus');
 
             // ============================================================
             // 状态
             // ============================================================
-            let currentStyle = 'white';
+            let currentTemplate = 'engineering';
             let currentFile = null;
             let isVideo = false;
             let mediaUrl = null;
-            let antiCode = generateAntiCode();
 
-            let mainCardState = { x: 30, y: 50, w: 240, h: 100 };
-            let antiTagState = { x: 160, y: 180, w: 180, h: 55 };
+            // 水印位置状态（每个模板独立）
+            let templateStates = {
+                engineering: { x: 30, y: 50, w: 200, h: 90 },
+                gps: { x: 30, y: 160, w: 160, h: 60 },
+                weather: { x: 30, y: 280, w: 170, h: 65 },
+                checkin: { x: 30, y: 390, w: 150, h: 55 },
+                patrol: { x: 200, y: 50, w: 140, h: 55 }
+            };
 
-            // ============================================================
-            // 防伪码
-            // ============================================================
-            function generateAntiCode() {
-                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-                let code = 'DKCE';
-                for (let i = 0; i < 11; i++) {
-                    code += chars.charAt(Math.floor(Math.random() * chars.length));
-                }
-                return code;
-            }
+            // 天气数据
+            let weatherData = {
+                temp: '5',
+                condition: '多云',
+                wind: '东风3级',
+                city: '北京',
+                icon: '⛅'
+            };
 
             // ============================================================
             // 位置数据
             // ============================================================
             const mockLocations = [
-                { name: '芝麻公园', addr: '成都市双流区·芝麻公园' },
+                { name: '中国尊建筑大厦', addr: '北京国贸' },
+                { name: '国贸', addr: '北京国贸' },
+                { name: '四姑娘山', addr: '四川成都四姑娘山' },
+                { name: '象牙山村', addr: '辽宁·铁岭市·象牙山村' },
+                { name: '幻想咖啡厅', addr: '上海浦东·幻想咖啡厅' },
+                { name: '珠穆朗玛峰', addr: '西藏·珠穆朗玛峰' },
                 { name: '黄龙溪派出所', addr: '成都市双流区·黄龙溪镇' },
                 { name: '天府广场', addr: '成都市青羊区·人民南路' },
                 { name: '春熙路', addr: '成都市锦江区·春熙路街道' },
@@ -766,128 +808,204 @@
             }
 
             // ============================================================
-            // 初始化
+            // 获取真实天气（免费API）
             // ============================================================
-            function initDateTime() {
-                const now = new Date();
-                const d = now.toISOString().split('T')[0];
-                const t = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
-                editDate.value = d;
-                editTime.value = t;
-            }
-            initDateTime();
+            async function fetchRealWeather() {
+                try {
+                    weatherStatus.textContent = '🌐 正在获取天气...';
+                    weatherStatus.className = 'weather-status loading';
 
-            // ============================================================
-            // 上传
-            // ============================================================
-            uploadImageBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                imageInput.click();
-            });
+                    // 1. 获取IP所在城市
+                    const ipRes = await fetch('https://ip-api.com/json/');
+                    const ipData = await ipRes.json();
+                    const city = ipData.city || '北京';
+                    const lat = ipData.lat || 39.9;
+                    const lon = ipData.lon || 116.4;
 
-            uploadVideoBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                videoInput.click();
-            });
+                    // 2. 获取天气
+                    const weatherRes = await fetch(
+                        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`
+                    );
+                    const weatherJson = await weatherRes.json();
 
-            imageInput.addEventListener('change', function() {
-                if (this.files && this.files[0]) {
-                    loadFile(this.files[0], false);
+                    if (weatherJson.current_weather) {
+                        const temp = Math.round(weatherJson.current_weather.temperature);
+                        const code = weatherJson.current_weather.weathercode;
+
+                        // 天气代码转文字
+                        const weatherMap = {
+                            0: { text: '晴', icon: '☀️' },
+                            1: { text: '晴', icon: '☀️' },
+                            2: { text: '多云', icon: '⛅' },
+                            3: { text: '阴', icon: '☁️' },
+                            45: { text: '雾', icon: '🌫️' },
+                            48: { text: '雾', icon: '🌫️' },
+                            51: { text: '小雨', icon: '🌦️' },
+                            53: { text: '小雨', icon: '🌦️' },
+                            55: { text: '小雨', icon: '🌦️' },
+                            61: { text: '小雨', icon: '🌧️' },
+                            63: { text: '中雨', icon: '🌧️' },
+                            65: { text: '大雨', icon: '🌧️' },
+                            71: { text: '小雪', icon: '❄️' },
+                            73: { text: '中雪', icon: '❄️' },
+                            75: { text: '大雪', icon: '❄️' },
+                            80: { text: '阵雨', icon: '🌦️' },
+                            95: { text: '雷雨', icon: '⛈️' },
+                        };
+
+                        const w = weatherMap[code] || { text: '晴', icon: '☀️' };
+
+                        weatherData = {
+                            temp: temp,
+                            condition: w.text,
+                            wind: '东风3级',
+                            city: city,
+                            icon: w.icon
+                        };
+
+                        weatherStatus.textContent = `✅ 天气已获取：${city} ${w.icon} ${temp}°C ${w.text}`;
+                        weatherStatus.className = 'weather-status ok';
+                    } else {
+                        throw new Error('天气数据无效');
+                    }
+                } catch (e) {
+                    console.warn('天气获取失败，使用默认数据', e);
+                    weatherData = {
+                        temp: '22',
+                        condition: '晴',
+                        wind: '微风',
+                        city: '北京',
+                        icon: '☀️'
+                    };
+                    weatherStatus.textContent = '⚠️ 使用默认天气（可手动编辑）';
+                    weatherStatus.className = 'weather-status';
                 }
-                this.value = '';
-            });
 
-            videoInput.addEventListener('change', function() {
-                if (this.files && this.files[0]) {
-                    loadFile(this.files[0], true);
-                }
-                this.value = '';
-            });
-
-            function loadFile(file, video) {
-                isVideo = video;
-                currentFile = file;
-                const url = URL.createObjectURL(file);
-                mediaUrl = url;
-
-                placeholder.style.display = 'none';
-                mediaContainer.classList.add('active');
-
-                if (video) {
-                    previewImage.style.display = 'none';
-                    previewVideo.style.display = 'block';
-                    previewVideo.src = url;
-                    previewVideo.load();
-                } else {
-                    previewVideo.style.display = 'none';
-                    previewImage.style.display = 'block';
-                    previewImage.src = url;
-                }
-
-                fileInfo.textContent = '📁 ' + file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
+                // 更新水印
                 renderWatermarks();
-                showToast('✅ 已加载' + (video ? '视频' : '照片'));
             }
 
             // ============================================================
-            // ★★★ 构建防伪标签HTML - "今"字点是黄色 ★★★
+            // 工具函数
             // ============================================================
-            function buildAntiTagHTML(code) {
-                return `
-                    <div class="anti-tag">
-                        <div class="anti-row-1">
-                            <span class="anti-brand">今<span class="highlight-dot">丶</span>日水印</span>
-                            <span class="anti-code">${code}</span>
-                        </div>
-                        <div class="anti-row-2">
-                            <span class="anti-sub">相机 真实可验</span>
-                        </div>
-                    </div>
-                `;
+            function getNow() {
+                const now = new Date();
+                const y = now.getFullYear();
+                const m = String(now.getMonth() + 1).padStart(2, '0');
+                const d = String(now.getDate()).padStart(2, '0');
+                const h = String(now.getHours()).padStart(2, '0');
+                const min = String(now.getMinutes()).padStart(2, '0');
+                const s = String(now.getSeconds()).padStart(2, '0');
+                const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+                return {
+                    date: y + '.' + m + '.' + d,
+                    time: h + ':' + min,
+                    fullTime: y + '-' + m + '-' + d + ' ' + h + ':' + min + ':' + s,
+                    weekday: weekdays[now.getDay()],
+                    year: y,
+                    month: m,
+                    day: d,
+                    hour: h,
+                    minute: min,
+                    second: s
+                };
             }
 
             // ============================================================
-            // ★★★ 构建主水印HTML ★★★
+            // 生成随机经纬度（模拟）
             // ============================================================
-            function buildMainCardHTML(title, date, time, weather, temp, location) {
-                if (currentStyle === 'white') {
-                    return `
-                        <div class="watermark-card">
-                            <div class="wm-header">
-                                <span class="wm-title">${title}</span>
-                                <span class="wm-badge">水印</span>
-                            </div>
-                            <div class="wm-body">
-                                <div class="wm-line"><span class="wm-label">拍摄时间：</span><span class="wm-value">${date} ${time}</span></div>
-                                <div class="wm-line"><span class="wm-label">天气：</span><span class="wm-value">${weather} 高温 <span class="wm-high-temp">${temp}°C</span></span></div>
-                                <div class="wm-line" style="margin-bottom:0;"><span class="wm-label">地点：</span><span class="wm-location-text">${location} <span class="wm-arrow">▸</span></span></div>
-                            </div>
-                        </div>
-                    `;
-                } else if (currentStyle === 'dark') {
-                    return `
-                        <div class="watermark-card" style="background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.05);">
-                            <div class="wm-body" style="padding:10px 14px 8px 14px;">
-                                <div class="wm-line" style="font-weight:500;font-size:13px;color:#fff;margin-bottom:2px;">${title}</div>
-                                <div class="wm-line" style="color:#fff;"><span class="wm-label" style="color:rgba(255,255,255,0.4);">时间：</span><span class="wm-value" style="color:#fff;">${date} ${time}</span></div>
-                                <div class="wm-line" style="color:#fff;"><span class="wm-label" style="color:rgba(255,255,255,0.4);">天气：</span><span class="wm-value" style="color:#fff;">${weather} ${temp}°C</span></div>
-                                <div class="wm-line" style="margin-bottom:0;color:#fff;"><span class="wm-label" style="color:rgba(255,255,255,0.4);">地点：</span><span class="wm-value" style="color:#fff;">${location}</span></div>
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    return `
-                        <div class="watermark-card" style="background:rgba(0,0,0,0.3);backdrop-filter:blur(4px);border:none;box-shadow:0 2px 12px rgba(0,0,0,0.3);">
-                            <div class="wm-body" style="background:transparent;padding:10px 14px 8px 14px;">
-                                <div style="font-size:20px;font-weight:300;color:#fff;letter-spacing:1px;">${date}</div>
-                                <div style="font-size:26px;font-weight:200;color:#fff;margin:-2px 0 2px 0;">${time}</div>
-                                <div style="display:flex;justify-content:space-between;font-size:12px;color:rgba(255,255,255,0.85);">
-                                    <span>${weather} ${temp}°C</span>
-                                    <span>${location}</span>
+            function getRandomGPS() {
+                const lat = (39 + Math.random() * 0.5).toFixed(6);
+                const lon = (116 + Math.random() * 0.5).toFixed(6);
+                return { lat, lon };
+            }
+
+            // ============================================================
+            // ★★★ 构建各模板HTML ★★★
+            // ============================================================
+            function buildTemplateHTML(template) {
+                const now = getNow();
+                const loc = editLocation.value || '北京国贸';
+                const title = editTitle.value || '工程记录';
+                const gps = getRandomGPS();
+                const w = weatherData;
+
+                switch (template) {
+                    case 'engineering':
+                        return `
+                            <div class="template-engineering">
+                                <div class="header">
+                                    <span class="title">${title}</span>
+                                    <span class="badge">水印</span>
+                                </div>
+                                <div class="body">
+                                    <div class="row"><span class="lbl">经度：</span><span class="val">${gps.lon}</span></div>
+                                    <div class="row"><span class="lbl">纬度：</span><span class="val">${gps.lat}</span></div>
+                                    <div class="row"><span class="lbl">地点：</span><span class="val">${loc}</span></div>
+                                    <div class="row"><span class="lbl">天气：</span><span class="val">${w.icon} ${w.condition} ${w.temp}°C ${w.wind}</span></div>
+                                    <div class="row"><span class="lbl">时间：</span><span class="val">${now.fullTime}</span></div>
                                 </div>
                             </div>
-                        </div>
-                    `;
+                        `;
+
+                    case 'gps':
+                        return `
+                            <div class="template-gps">
+                                <div class="main-row">
+                                    <span class="big">${Math.round(Math.random() * 20 + 10)}°</span>
+                                    <span class="date">${now.date} ${now.weekday}</span>
+                                </div>
+                                <div class="sub-row">
+                                    <span class="lbl">经度：</span>${gps.lon} &nbsp; <span class="lbl">纬度：</span>${gps.lat}
+                                </div>
+                                <div class="sub-row">
+                                    <span class="lbl">地址：</span>${loc}
+                                </div>
+                            </div>
+                        `;
+
+                    case 'weather':
+                        return `
+                            <div class="template-weather">
+                                <div class="top">
+                                    <div class="left">
+                                        <span class="icon">${w.icon}</span>
+                                        <span class="temp">${w.temp}°</span>
+                                        <span class="desc">${w.condition}</span>
+                                    </div>
+                                    <span class="time">${now.time}</span>
+                                </div>
+                                <div class="bottom">
+                                    ${w.wind} · ${loc}
+                                </div>
+                            </div>
+                        `;
+
+                    case 'checkin':
+                        return `
+                            <div class="template-checkin">
+                                <div class="time-big">${now.time}</div>
+                                <div class="info-row">
+                                    <span>${now.date} ${now.weekday}</span>
+                                    <span>${loc}</span>
+                                </div>
+                            </div>
+                        `;
+
+                    case 'patrol':
+                        return `
+                            <div class="template-patrol">
+                                <div class="title">治安巡逻</div>
+                                <div class="info">
+                                    <span>${now.date}</span>
+                                    <span>${now.time}</span>
+                                    <span>${loc}</span>
+                                </div>
+                            </div>
+                        `;
+
+                    default:
+                        return '';
                 }
             }
 
@@ -900,75 +1018,29 @@
                 const rect = container.getBoundingClientRect();
                 const scale = rect.width / 420 || 1;
 
-                const date = editDate.value || '2026-08-08';
-                const time = editTime.value || '15:12';
-                const weather = editWeather.value || '晴';
-                const temp = editTemp.value || '35';
-                const location = editLocation.value || '成都市双流区·芝麻公园';
-                const title = editTitle.value || '工程记录';
-
-                const dateParts = date.split('-');
-                const formattedDate = dateParts[0] + '.' + dateParts[1] + '.' + dateParts[2];
-
-                if (showAntiTag.checked) {
-                    antiCode = generateAntiCode();
-                }
-
-                const showMain = showMainCard.checked;
-                const showAnti = showAntiTag.checked;
-
-                const ms = mainCardState;
-                const as = antiTagState;
-
-                let html = '';
-
-                if (showMain) {
-                    html += `
-                        <div class="draggable-item" id="mainCard" 
-                             style="left:${ms.x * scale}px; top:${ms.y * scale}px; width:${ms.w * scale}px; height:${ms.h * scale}px;"
-                             data-x="${ms.x}" data-y="${ms.y}" data-w="${ms.w}" data-h="${ms.h}">
-                            <div class="drag-border"></div>
-                            ${buildMainCardHTML(title, formattedDate, time, weather, temp, location)}
-                            <div class="resize-handle" id="mainResize"></div>
-                        </div>
-                    `;
-                }
-
-                if (showAnti) {
-                    html += `
-                        <div class="draggable-item" id="antiTag" 
-                             style="left:${as.x * scale}px; top:${as.y * scale}px; width:${as.w * scale}px; height:${as.h * scale}px;"
-                             data-x="${as.x}" data-y="${as.y}" data-w="${as.w}" data-h="${as.h}">
-                            <div class="drag-border"></div>
-                            ${buildAntiTagHTML(antiCode)}
-                            <div class="resize-handle" id="antiResize"></div>
-                        </div>
-                    `;
-                }
+                const state = templateStates[currentTemplate];
+                const html = `
+                    <div class="draggable-item" id="watermarkItem" 
+                         style="left:${state.x * scale}px; top:${state.y * scale}px; width:${state.w * scale}px; height:${state.h * scale}px;"
+                         data-x="${state.x}" data-y="${state.y}" data-w="${state.w}" data-h="${state.h}">
+                        <div class="drag-border"></div>
+                        ${buildTemplateHTML(currentTemplate)}
+                        <div class="resize-handle" id="resizeHandle"></div>
+                    </div>
+                `;
 
                 layer.innerHTML = html;
 
                 setTimeout(() => {
-                    initDraggable('mainCard', 'mainResize', (x, y, w, h) => {
-                        mainCardState.x = x;
-                        mainCardState.y = y;
-                        mainCardState.w = w;
-                        mainCardState.h = h;
-                    });
-                    initDraggable('antiTag', 'antiResize', (x, y, w, h) => {
-                        antiTagState.x = x;
-                        antiTagState.y = y;
-                        antiTagState.w = w;
-                        antiTagState.h = h;
-                    });
+                    initDraggable();
                 }, 50);
             }
 
             // ============================================================
             // 拖动系统
             // ============================================================
-            function initDraggable(elementId, resizeHandleId, onUpdate) {
-                const el = document.getElementById(elementId);
+            function initDraggable() {
+                const el = document.getElementById('watermarkItem');
                 if (!el) return;
 
                 const container = mediaContainer;
@@ -989,7 +1061,7 @@
                     e.preventDefault();
                 });
 
-                const resizeHandle = document.getElementById(resizeHandleId);
+                const resizeHandle = document.getElementById('resizeHandle');
                 if (resizeHandle) {
                     resizeHandle.addEventListener('mousedown', function(e) {
                         e.stopPropagation();
@@ -1018,7 +1090,8 @@
                         el.dataset.y = newY;
                         el.style.left = (newX * scale) + 'px';
                         el.style.top = (newY * scale) + 'px';
-                        if (onUpdate) onUpdate(newX, newY, parseFloat(el.dataset.w), parseFloat(el.dataset.h));
+                        templateStates[currentTemplate].x = newX;
+                        templateStates[currentTemplate].y = newY;
                     }
 
                     if (isResizing) {
@@ -1030,7 +1103,8 @@
                         el.dataset.h = newH;
                         el.style.width = (newW * scale) + 'px';
                         el.style.height = (newH * scale) + 'px';
-                        if (onUpdate) onUpdate(parseFloat(el.dataset.x), parseFloat(el.dataset.y), newW, newH);
+                        templateStates[currentTemplate].w = newW;
+                        templateStates[currentTemplate].h = newH;
                     }
                 });
 
@@ -1086,7 +1160,8 @@
                         el.dataset.y = newY;
                         el.style.left = (newX * scale) + 'px';
                         el.style.top = (newY * scale) + 'px';
-                        if (onUpdate) onUpdate(newX, newY, parseFloat(el.dataset.w), parseFloat(el.dataset.h));
+                        templateStates[currentTemplate].x = newX;
+                        templateStates[currentTemplate].y = newY;
                         e.preventDefault();
                     }
 
@@ -1100,7 +1175,8 @@
                         el.dataset.h = newH;
                         el.style.width = (newW * scale) + 'px';
                         el.style.height = (newH * scale) + 'px';
-                        if (onUpdate) onUpdate(parseFloat(el.dataset.x), parseFloat(el.dataset.y), newW, newH);
+                        templateStates[currentTemplate].w = newW;
+                        templateStates[currentTemplate].h = newH;
                         e.preventDefault();
                     }
                 });
@@ -1112,15 +1188,74 @@
             }
 
             // ============================================================
-            // 事件绑定
+            // 上传
             // ============================================================
-            editDate.addEventListener('change', renderWatermarks);
-            editTime.addEventListener('change', renderWatermarks);
-            editWeather.addEventListener('change', renderWatermarks);
-            editTemp.addEventListener('change', renderWatermarks);
+            uploadImageBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                imageInput.click();
+            });
+
+            uploadVideoBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                videoInput.click();
+            });
+
+            imageInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    loadFile(this.files[0], false);
+                }
+                this.value = '';
+            });
+
+            videoInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    loadFile(this.files[0], true);
+                }
+                this.value = '';
+            });
+
+            function loadFile(file, video) {
+                isVideo = video;
+                currentFile = file;
+                const url = URL.createObjectURL(file);
+                mediaUrl = url;
+
+                placeholder.style.display = 'none';
+                mediaContainer.classList.add('active');
+
+                if (video) {
+                    previewImage.style.display = 'none';
+                    previewVideo.style.display = 'block';
+                    previewVideo.src = url;
+                    previewVideo.load();
+                } else {
+                    previewVideo.style.display = 'none';
+                    previewImage.style.display = 'block';
+                    previewImage.src = url;
+                }
+
+                fileInfo.textContent = '📁 ' + file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
+                renderWatermarks();
+                showToast('✅ 已加载' + (video ? '视频' : '照片'));
+            }
+
+            // ============================================================
+            // 模板切换
+            // ============================================================
+            document.querySelectorAll('.template-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.template-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentTemplate = this.dataset.template;
+                    renderWatermarks();
+                });
+            });
+
+            // ============================================================
+            // 编辑事件
+            // ============================================================
+            editLocation.addEventListener('input', renderWatermarks);
             editTitle.addEventListener('input', renderWatermarks);
-            showAntiTag.addEventListener('change', renderWatermarks);
-            showMainCard.addEventListener('change', renderWatermarks);
 
             // ============================================================
             // 位置联想
@@ -1176,163 +1311,116 @@
             });
 
             // ============================================================
-            // 样式切换
-            // ============================================================
-            document.querySelectorAll('.style-btn').forEach(function(btn) {
-                btn.addEventListener('click', function() {
-                    document.querySelectorAll('.style-btn').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    currentStyle = this.dataset.style;
-                    renderWatermarks();
-                });
-            });
-
-            // ============================================================
             // Canvas导出
             // ============================================================
-            function drawWatermarksOnCanvas(ctx, w, h) {
-                const date = editDate.value || '2026-08-08';
-                const time = editTime.value || '15:12';
-                const weather = editWeather.value || '晴';
-                const temp = editTemp.value || '35';
-                const location = editLocation.value || '成都市双流区·芝麻公园';
+            function drawWatermarkOnCanvas(ctx, w, h) {
+                const now = getNow();
+                const loc = editLocation.value || '北京国贸';
                 const title = editTitle.value || '工程记录';
-                const showAnti = showAntiTag.checked;
-                const showMain = showMainCard.checked;
+                const gps = getRandomGPS();
+                const wd = weatherData;
 
-                const dateParts = date.split('-');
-                const formattedDate = dateParts[0] + '.' + dateParts[1] + '.' + dateParts[2];
-                const code = showAnti ? generateAntiCode() : '';
-
+                const state = templateStates[currentTemplate];
                 const scale = Math.min(w, h) / 800;
+                const cx = state.x * (w / 420);
+                const cy = state.y * (h / 700);
+                const cw = state.w * (w / 420);
+                const ch = state.h * (h / 700);
 
-                if (showMain) {
-                    const ms = mainCardState;
-                    const cx = ms.x * (w / 420);
-                    const cy = ms.y * (h / 700);
-                    const cw = ms.w * (w / 420);
-                    const ch = ms.h * (h / 700);
-                    drawMainCard(ctx, cx, cy, cw, ch, title, formattedDate, time, weather, temp, location, scale);
-                }
+                // 绘制模板
+                ctx.save();
 
-                if (showAnti) {
-                    const as = antiTagState;
-                    const ax = as.x * (w / 420);
-                    const ay = as.y * (h / 700);
-                    const aw = as.w * (w / 420);
-                    const ah = as.h * (h / 700);
-                    drawAntiTag(ctx, ax, ay, aw, ah, code, scale);
-                }
-            }
-
-            function drawMainCard(ctx, x, y, w, h, title, date, time, weather, temp, location, scale) {
-                const r = 6 * scale;
-                const pad = 10 * scale;
-
-                ctx.shadowColor = 'rgba(0,0,0,0.5)';
-                ctx.shadowBlur = 16 * scale;
-                ctx.fillStyle = '#ffffff';
-                ctx.beginPath();
-                ctx.roundRect(x, y, w, h, r);
-                ctx.fill();
-                ctx.shadowBlur = 0;
-
-                let cy = y;
-                const barH = 24 * scale;
-                const grad = ctx.createLinearGradient(x, cy, x, cy + barH);
-                grad.addColorStop(0, '#1a6bc4');
-                grad.addColorStop(1, '#2a7ee8');
-                ctx.fillStyle = grad;
-                ctx.beginPath();
-                ctx.roundRect(x, cy, w, barH, r);
-                ctx.fill();
-
-                ctx.fillStyle = '#ffffff';
-                ctx.font = '500 ' + (11 * scale) + 'px -apple-system, sans-serif';
-                ctx.textAlign = 'left';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(title, x + pad, cy + barH / 2);
-
-                ctx.fillStyle = 'rgba(255,255,255,0.5)';
-                ctx.font = (7 * scale) + 'px -apple-system, sans-serif';
-                ctx.textAlign = 'right';
-                ctx.fillText('水印', x + w - pad, cy + barH / 2);
-
-                cy += barH + 4 * scale;
-                const lineH = 18 * scale;
-                const labelX = x + pad;
-                const valX = x + pad + 50 * scale;
-
-                ctx.fillStyle = '#555555';
-                ctx.font = (10 * scale) + 'px -apple-system, sans-serif';
-                ctx.textAlign = 'left';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('拍摄时间：', labelX, cy + lineH / 2);
-                ctx.fillStyle = '#1a1a1a';
-                ctx.fillText(date + ' ' + time, valX, cy + lineH / 2);
-                cy += lineH;
-
-                ctx.fillStyle = '#555555';
-                ctx.font = (10 * scale) + 'px -apple-system, sans-serif';
-                ctx.fillText('天气：', labelX, cy + lineH / 2);
-                ctx.fillStyle = '#1a1a1a';
-                ctx.fillText(weather + ' 高温 ', valX, cy + lineH / 2);
-                ctx.fillStyle = '#e53935';
-                ctx.fillText(temp + '°C', valX + ctx.measureText(weather + ' 高温 ').width, cy + lineH / 2);
-                cy += lineH;
-
-                ctx.fillStyle = '#555555';
-                ctx.font = (10 * scale) + 'px -apple-system, sans-serif';
-                ctx.fillText('地点：', labelX, cy + lineH / 2);
-                ctx.fillStyle = '#1a1a1a';
-                ctx.fillText(location, valX, cy + lineH / 2);
-            }
-
-            function drawAntiTag(ctx, x, y, w, h, code, scale) {
-                const pad = 10 * scale;
-
+                // 半透明背景
                 ctx.shadowColor = 'rgba(0,0,0,0.4)';
                 ctx.shadowBlur = 12 * scale;
-                ctx.fillStyle = 'rgba(0,0,0,0.55)';
+                ctx.fillStyle = 'rgba(0,0,0,0.5)';
                 ctx.beginPath();
-                ctx.roundRect(x, y, w, h, 6 * scale);
+                ctx.roundRect(cx, cy, cw, ch, 6 * scale);
                 ctx.fill();
                 ctx.shadowBlur = 0;
 
-                ctx.strokeStyle = 'rgba(255,255,255,0.06)';
-                ctx.lineWidth = 1;
-                ctx.beginPath();
-                ctx.roundRect(x, y, w, h, 6 * scale);
-                ctx.stroke();
+                const pad = 10 * scale;
+                const font = 10 * scale;
+                const smallFont = 8 * scale;
 
-                const cy = y + h / 2;
-
-                // "今日水印" - "今"字的点是黄色
                 ctx.fillStyle = '#ffffff';
-                ctx.font = '600 ' + (13 * scale) + 'px "STKaiti","KaiTi",serif';
+                ctx.font = font + 'px -apple-system, sans-serif';
                 ctx.textAlign = 'left';
-                ctx.textBaseline = 'middle';
+                ctx.textBaseline = 'top';
 
-                // 画"今"
-                ctx.fillText('今', x + pad, cy - 5 * scale);
-                // "今"字的点是黄色
-                ctx.fillStyle = '#FFD700';
-                ctx.fillText('丶', x + pad + 11 * scale, cy - 8 * scale);
-                // 继续画"日水印"
-                ctx.fillStyle = '#ffffff';
-                ctx.fillText('日水印', x + pad + 18 * scale, cy - 5 * scale);
+                // 简化绘制：根据模板显示不同内容
+                let yPos = cy + pad;
 
-                // 防伪码 - 右上
-                ctx.fillStyle = 'rgba(255,255,255,0.3)';
-                ctx.font = (7 * scale) + 'px monospace';
-                ctx.textAlign = 'right';
-                ctx.fillText(code, x + w - pad, cy - 5 * scale);
+                if (currentTemplate === 'engineering') {
+                    ctx.fillStyle = '#FFD700';
+                    ctx.font = '600 ' + (12 * scale) + 'px -apple-system, sans-serif';
+                    ctx.fillText(title, cx + pad, yPos);
+                    yPos += 16 * scale;
 
-                // 相机 真实可验 - 左下
-                ctx.fillStyle = 'rgba(255,255,255,0.4)';
-                ctx.font = '300 ' + (7.5 * scale) + 'px -apple-system, sans-serif';
-                ctx.textAlign = 'left';
-                ctx.fillText('相机 真实可验', x + pad, cy + 8 * scale);
+                    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+                    ctx.font = smallFont + 'px -apple-system, sans-serif';
+                    ctx.fillText('经度：' + gps.lon, cx + pad, yPos);
+                    yPos += 12 * scale;
+                    ctx.fillText('纬度：' + gps.lat, cx + pad, yPos);
+                    yPos += 12 * scale;
+                    ctx.fillText('地点：' + loc, cx + pad, yPos);
+                    yPos += 12 * scale;
+                    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+                    ctx.fillText(wd.icon + ' ' + wd.condition + ' ' + wd.temp + '°C ' + wd.wind, cx + pad, yPos);
+                    yPos += 12 * scale;
+                    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                    ctx.fillText(now.fullTime, cx + pad, yPos);
+
+                } else if (currentTemplate === 'gps') {
+                    ctx.font = '300 ' + (18 * scale) + 'px -apple-system, sans-serif';
+                    ctx.fillStyle = '#fff';
+                    ctx.fillText(Math.round(Math.random() * 20 + 10) + '°', cx + pad, yPos);
+                    ctx.font = smallFont + 'px -apple-system, sans-serif';
+                    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                    ctx.textAlign = 'right';
+                    ctx.fillText(now.date + ' ' + now.weekday, cx + cw - pad, yPos + 4 * scale);
+                    ctx.textAlign = 'left';
+                    yPos += 22 * scale;
+                    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+                    ctx.fillText('经度：' + gps.lon + '  纬度：' + gps.lat, cx + pad, yPos);
+                    yPos += 12 * scale;
+                    ctx.fillText('地址：' + loc, cx + pad, yPos);
+
+                } else if (currentTemplate === 'weather') {
+                    ctx.font = '28 * scale' + 'px -apple-system, sans-serif';
+                    ctx.fillStyle = '#fff';
+                    ctx.fillText(wd.icon, cx + pad, yPos - 4 * scale);
+                    ctx.font = '300 ' + (18 * scale) + 'px -apple-system, sans-serif';
+                    ctx.fillText(wd.temp + '°', cx + pad + 32 * scale, yPos + 2 * scale);
+                    ctx.font = smallFont + 'px -apple-system, sans-serif';
+                    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                    ctx.textAlign = 'right';
+                    ctx.fillText(now.time, cx + cw - pad, yPos + 4 * scale);
+                    ctx.textAlign = 'left';
+                    yPos += 28 * scale;
+                    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+                    ctx.fillText(wd.condition + ' ' + wd.wind + ' · ' + loc, cx + pad, yPos);
+
+                } else if (currentTemplate === 'checkin') {
+                    ctx.font = '200 ' + (28 * scale) + 'px -apple-system, sans-serif';
+                    ctx.fillStyle = '#fff';
+                    ctx.fillText(now.time, cx + pad, yPos);
+                    ctx.font = smallFont + 'px -apple-system, sans-serif';
+                    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                    yPos += 32 * scale;
+                    ctx.fillText(now.date + ' ' + now.weekday + '  ' + loc, cx + pad, yPos);
+
+                } else if (currentTemplate === 'patrol') {
+                    ctx.fillStyle = '#FFD700';
+                    ctx.font = '600 ' + (16 * scale) + 'px -apple-system, sans-serif';
+                    ctx.fillText('治安巡逻', cx + pad, yPos);
+                    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                    ctx.font = smallFont + 'px -apple-system, sans-serif';
+                    yPos += 20 * scale;
+                    ctx.fillText(now.date + '  ' + now.time + '  ' + loc, cx + pad, yPos);
+                }
+
+                ctx.restore();
             }
 
             if (!CanvasRenderingContext2D.prototype.roundRect) {
@@ -1383,7 +1471,7 @@
                     canvas.width = imgObj.width;
                     canvas.height = imgObj.height;
                     ctx.drawImage(imgObj, 0, 0);
-                    drawWatermarksOnCanvas(ctx, canvas.width, canvas.height);
+                    drawWatermarkOnCanvas(ctx, canvas.width, canvas.height);
 
                     const link = document.createElement('a');
                     const ts = Date.now();
@@ -1427,7 +1515,7 @@
                     canvas.height = video.videoHeight || 720;
 
                     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                    drawWatermarksOnCanvas(ctx, canvas.width, canvas.height);
+                    drawWatermarkOnCanvas(ctx, canvas.width, canvas.height);
 
                     const link = document.createElement('a');
                     const ts = Date.now();
@@ -1459,13 +1547,24 @@
             });
 
             // ============================================================
-            // 初始渲染
+            // 定时刷新时间（每分钟）
             // ============================================================
+            setInterval(function() {
+                if (mediaContainer.classList.contains('active')) {
+                    renderWatermarks();
+                }
+            }, 60000);
+
+            // ============================================================
+            // 初始化
+            // ============================================================
+            fetchRealWeather();
             renderWatermarks();
 
-            console.log('📷 今日水印相机 - 最终还原版');
-            console.log('✅ "今"字的点是黄色');
-            console.log('✅ 格式：今日水印 / 相机 真实可验 / 防伪 DKCE...');
+            console.log('📷 今日水印 - 5模板版');
+            console.log('✅ 模板：工程记录 / 经纬度 / 天气 / 打卡 / 治安巡逻');
+            console.log('✅ 自动获取真实天气');
+            console.log('✅ 每个模板独立拖动和缩放');
 
         })();
     </script>
